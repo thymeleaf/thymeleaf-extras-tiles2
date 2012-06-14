@@ -21,9 +21,8 @@ package org.thymeleaf.tiles2;
 
 import java.util.Map;
 
-import org.apache.tiles.Attribute;
 import org.apache.tiles.context.TilesRequestContext;
-import org.apache.tiles.evaluator.AttributeEvaluator;
+import org.apache.tiles.evaluator.AbstractAttributeEvaluator;
 
 
 
@@ -35,19 +34,14 @@ import org.apache.tiles.evaluator.AttributeEvaluator;
  * @since 2.0.9
  *
  */
-public class ThymeleafAttributeEvaluator implements AttributeEvaluator {
+public class ThymeleafAttributeEvaluator extends AbstractAttributeEvaluator {
 
-    public Object evaluate(String expression, TilesRequestContext request) {
-        // TODO Auto-generated method stub
-        return null;
+    
+    public Object evaluate(final String expression, final TilesRequestContext request) {
+        return "EXPRESSION: " + expression;
     }
 
-    public Object evaluate(Attribute attribute, TilesRequestContext request) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public void init(Map<String, String> initParameters) {
+    public void init(final Map<String, String> initParameters) {
         // TODO Auto-generated method stub
         
     }
