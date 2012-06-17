@@ -17,12 +17,11 @@
  * 
  * =============================================================================
  */
-package org.thymeleaf.tiles2;
+package org.thymeleaf.tiles2.web.startup;
 
-import java.util.Map;
-
-import org.apache.tiles.context.TilesRequestContext;
-import org.apache.tiles.evaluator.AbstractAttributeEvaluator;
+import org.apache.tiles.startup.TilesInitializer;
+import org.apache.tiles.web.startup.AbstractTilesInitializerServlet;
+import org.thymeleaf.tiles2.startup.ThymeleafTilesInitializer;
 
 
 
@@ -34,20 +33,25 @@ import org.apache.tiles.evaluator.AbstractAttributeEvaluator;
  * @since 2.0.9
  *
  */
-public class ThymeleafAttributeEvaluator extends AbstractAttributeEvaluator {
+public class ThymeleafTilesServlet 
+        extends AbstractTilesInitializerServlet {
 
     
-    public Object evaluate(final String expression, final TilesRequestContext request) {
-        return "EXPRESSION: " + expression;
+    private static final long serialVersionUID = 199240475754703844L;
+    
+    
+
+    public ThymeleafTilesServlet() {
+        super();
+    }
+    
+    
+    
+
+    @Override
+    protected TilesInitializer createTilesInitializer() {
+        return new ThymeleafTilesInitializer();
     }
 
-    public void init(final Map<String, String> initParameters) {
-        // TODO Auto-generated method stub
-        
-    }
-
-
-    
-    
     
 }
