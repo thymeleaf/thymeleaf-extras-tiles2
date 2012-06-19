@@ -27,7 +27,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.tiles.context.TilesRequestContext;
 import org.springframework.context.ApplicationContext;
-import org.springframework.web.servlet.view.AbstractTemplateView;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.IContext;
 import org.thymeleaf.spring3.context.SpringWebContext;
@@ -81,7 +80,7 @@ public class SpringThymeleafAttributeRenderer
             final TilesRequestContext request, final HttpServletRequest httpServletRequest,
             final ServletContext servletContext, final Locale locale,
             final Map<String, Object> variables) {
-System.out.println("HERE IT IS THE REQUST CONTEXT: " + httpServletRequest.getAttribute(AbstractTemplateView.SPRING_MACRO_REQUEST_CONTEXT_ATTRIBUTE));
+
         return new SpringWebContext(
                 httpServletRequest, servletContext, locale, (Map<String,?>)variables,
                 this.springApplicationContext);
