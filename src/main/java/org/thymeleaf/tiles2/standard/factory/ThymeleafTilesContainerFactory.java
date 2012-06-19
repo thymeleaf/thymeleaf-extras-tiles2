@@ -19,13 +19,10 @@
  */
 package org.thymeleaf.tiles2.standard.factory;
 
-import org.apache.tiles.TilesApplicationContext;
-import org.apache.tiles.TilesContainer;
-import org.apache.tiles.context.TilesRequestContextFactory;
-import org.apache.tiles.evaluator.AttributeEvaluatorFactory;
-import org.apache.tiles.factory.BasicTilesContainerFactory;
-import org.apache.tiles.renderer.impl.BasicRendererFactory;
-import org.thymeleaf.tiles2.standard.renderer.impl.ThymeleafAttributeRenderer;
+import org.thymeleaf.tiles2.factory.AbstractThymeleafTilesContainerFactory;
+import org.thymeleaf.tiles2.localeresolver.LocaleResolverHolder;
+import org.thymeleaf.tiles2.renderer.AbstractThymeleafAttributeRenderer;
+import org.thymeleaf.tiles2.standard.renderer.ThymeleafAttributeRenderer;
 
 
 
@@ -37,7 +34,7 @@ import org.thymeleaf.tiles2.standard.renderer.impl.ThymeleafAttributeRenderer;
  *
  */
 public class ThymeleafTilesContainerFactory 
-        extends BasicTilesContainerFactory {
+        extends AbstractThymeleafTilesContainerFactory {
 
     
     
@@ -47,25 +44,10 @@ public class ThymeleafTilesContainerFactory
 
     
     
-    
     @Override
-    protected void registerAttributeRenderers(
-            final BasicRendererFactory rendererFactory,
-            final TilesApplicationContext applicationContext,
-            final TilesRequestContextFactory contextFactory,
-            final TilesContainer container,
-            final AttributeEvaluatorFactory attributeEvaluatorFactory) {
-
-        super.registerAttributeRenderers(rendererFactory, applicationContext,
-                contextFactory, container, attributeEvaluatorFactory);
-        
-        final ThymeleafAttributeRenderer thymeleafRenderer = new ThymeleafAttributeRenderer();
-        thymeleafRenderer.setApplicationContext(applicationContext);
-        thymeleafRenderer.setRequestContextFactory(contextFactory);
-        thymeleafRenderer.setAttributeEvaluatorFactory(attributeEvaluatorFactory);
-        rendererFactory.registerRenderer("thymeleaf", thymeleafRenderer);
-        
+    protected AbstractThymeleafAttributeRenderer createAttributeRenderer(
+            final LocaleResolverHolder localeResolverHolder) {
+        return new ThymeleafAttributeRenderer(localeResolverHolder);
     }
-
     
 }

@@ -19,43 +19,15 @@
  */
 package org.thymeleaf.tiles2.spring.web.configurer;
 
-import java.io.IOException;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.tiles.TilesApplicationContext;
-import org.apache.tiles.TilesContainer;
-import org.apache.tiles.awareness.TilesApplicationContextAware;
-import org.apache.tiles.context.TilesRequestContextFactory;
-import org.apache.tiles.definition.DefinitionsFactory;
-import org.apache.tiles.definition.DefinitionsFactoryException;
-import org.apache.tiles.definition.DefinitionsReader;
-import org.apache.tiles.definition.Refreshable;
-import org.apache.tiles.definition.dao.BaseLocaleUrlDefinitionDAO;
-import org.apache.tiles.definition.dao.CachingLocaleUrlDefinitionDAO;
-import org.apache.tiles.definition.digester.DigesterDefinitionsReader;
-import org.apache.tiles.evaluator.AttributeEvaluatorFactory;
-import org.apache.tiles.factory.AbstractTilesContainerFactory;
-import org.apache.tiles.factory.BasicTilesContainerFactory;
-import org.apache.tiles.impl.BasicTilesContainer;
-import org.apache.tiles.impl.mgmt.CachingTilesContainer;
-import org.apache.tiles.locale.LocaleResolver;
-import org.apache.tiles.preparer.PreparerFactory;
-import org.apache.tiles.renderer.impl.BasicRendererFactory;
-import org.apache.tiles.startup.AbstractTilesInitializer;
 import org.apache.tiles.startup.TilesInitializer;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.BeanWrapper;
-import org.springframework.beans.PropertyAccessorFactory;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Required;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.util.ClassUtils;
-import org.springframework.web.servlet.view.tiles2.SpringLocaleResolver;
 import org.springframework.web.servlet.view.tiles2.TilesConfigurer;
 import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.exceptions.ConfigurationException;
-import org.thymeleaf.tiles2.spring.renderer.impl.SpringThymeleafAttributeRenderer;
+import org.thymeleaf.tiles2.spring.web.startup.SpringThymeleafTilesInitializer;
 
 
 
@@ -67,7 +39,9 @@ import org.thymeleaf.tiles2.spring.renderer.impl.SpringThymeleafAttributeRendere
  * @since 2.0.9
  *
  */
-public class SpringThymeleafTilesConfigurer extends TilesConfigurer {
+public class SpringThymeleafTilesConfigurer 
+        extends TilesConfigurer
+        implements ApplicationContextAware {
 
     
     protected static final boolean tiles22Present = ClassUtils.isPresent(
@@ -75,6 +49,7 @@ public class SpringThymeleafTilesConfigurer extends TilesConfigurer {
     
     
     private TemplateEngine templateEngine = null; 
+    private ApplicationContext applicationContext = null; 
     
 
 
@@ -92,9 +67,23 @@ public class SpringThymeleafTilesConfigurer extends TilesConfigurer {
     }
 
 
-
+    @Required
     public void setTemplateEngine(final TemplateEngine templateEngine) {
         this.templateEngine = templateEngine;
+    }
+
+    
+    
+    public ApplicationContext getApplicationContext() {
+        return this.applicationContext;
+    }
+
+    
+
+    @Required
+    public void setApplicationContext(final ApplicationContext applicationContext)
+            throws BeansException {
+        this.applicationContext = applicationContext;
     }
 
 
@@ -108,229 +97,9 @@ public class SpringThymeleafTilesConfigurer extends TilesConfigurer {
      */
     @Override
     protected TilesInitializer createTilesInitializer() {
-        return new ThymeleafSpringTilesInitializer(this);
+        return new SpringThymeleafTilesInitializer(this);
     }
 
-
     
-    
-    
-    
-    
-    protected static class ThymeleafSpringTilesInitializer extends AbstractTilesInitializer {
-        
-        private final SpringThymeleafTilesConfigurer configurer;
-
-        protected ThymeleafSpringTilesInitializer(final SpringThymeleafTilesConfigurer configurer) {
-            super();
-            this.configurer = configurer;
-        }
-        
-        @Override
-        protected AbstractTilesContainerFactory createContainerFactory(TilesApplicationContext context) {
-            return new ThymeleafSpringTilesContainerFactory(this.configurer);
-        }
-        
-    }
-
-
-    
-    
-    
-    protected static class ThymeleafSpringTilesContainerFactory extends BasicTilesContainerFactory {
-        
-        private final SpringThymeleafTilesConfigurer configurer;
-        
-        
-        protected ThymeleafSpringTilesContainerFactory(final SpringThymeleafTilesConfigurer configurer) {
-            super();
-            this.configurer = configurer;
-        }
-        
-        
-
-        @Override
-        protected BasicTilesContainer instantiateContainer(final TilesApplicationContext context) {
-            final boolean useMutableTilesContainer =
-                    TilesConfigurerSuperClassIntegration.getUseMutableTilesContainer(this.configurer);
-            return (useMutableTilesContainer ? new CachingTilesContainer() : new BasicTilesContainer());
-        }
-
-        
-        
-        @Override
-        protected void registerRequestContextFactory(final String className,
-                final List<TilesRequestContextFactory> factories, final TilesRequestContextFactory parent) {
-            // Avoid Tiles 2.2 warn logging when default RequestContextFactory impl class not found
-            if (ClassUtils.isPresent(className, TilesConfigurer.class.getClassLoader())) {
-                super.registerRequestContextFactory(className, factories, parent);
-            }
-        }
-
-        
-        
-        @Override
-        protected List<URL> getSourceURLs(final TilesApplicationContext applicationContext,
-                final TilesRequestContextFactory contextFactory) {
-            
-            final String[] definitions =
-                    TilesConfigurerSuperClassIntegration.getDefinitions(this.configurer);
-            
-            if (definitions != null) {
-                try {
-                    final List<URL> result = new LinkedList<URL>();
-                    for (String definition : definitions) {
-                        result.addAll(applicationContext.getResources(definition));
-                    }
-                    return result;
-                } catch (IOException ex) {
-                    throw new DefinitionsFactoryException("Cannot load definition URLs", ex);
-                }
-            }
-            return super.getSourceURLs(applicationContext, contextFactory);
-            
-        }
-        
-        
-
-        @Override
-        protected BaseLocaleUrlDefinitionDAO instantiateLocaleDefinitionDao(
-                final TilesApplicationContext applicationContext,
-                final TilesRequestContextFactory contextFactory, final LocaleResolver resolver) {
-            
-            final BaseLocaleUrlDefinitionDAO dao = 
-                    super.instantiateLocaleDefinitionDao(applicationContext, contextFactory, resolver);
-            
-            final boolean checkRefresh =
-                    TilesConfigurerSuperClassIntegration.getCheckRefresh(this.configurer);
-            
-            if (checkRefresh && dao instanceof CachingLocaleUrlDefinitionDAO) {
-                ((CachingLocaleUrlDefinitionDAO) dao).setCheckRefresh(checkRefresh);
-            }
-            
-            return dao;
-            
-        }
-        
-
-        
-        @Override
-        protected DefinitionsReader createDefinitionsReader(
-                final TilesApplicationContext applicationContext,
-                final TilesRequestContextFactory contextFactory) {
-            
-            final DigesterDefinitionsReader reader = new DigesterDefinitionsReader();
-            
-            final boolean validateDefinitions =
-                    TilesConfigurerSuperClassIntegration.getValidateDefinitions(this.configurer);
-            
-            if (!validateDefinitions){
-                final Map<String,String> map = new HashMap<String,String>();
-                map.put(DigesterDefinitionsReader.PARSER_VALIDATE_PARAMETER_NAME, Boolean.FALSE.toString());
-                reader.init(map);
-            }
-            
-            return reader;
-            
-        }
-
-        
-        
-        @Override
-        protected DefinitionsFactory createDefinitionsFactory(
-                final TilesApplicationContext applicationContext,
-                final TilesRequestContextFactory contextFactory, final LocaleResolver resolver) {
-            
-            final Class<? extends DefinitionsFactory> definitionsFactoryClass =
-                    TilesConfigurerSuperClassIntegration.getDefinitionsFactoryClass(this.configurer);
-            
-            if (definitionsFactoryClass != null) {
-                
-                DefinitionsFactory factory = BeanUtils.instantiate(definitionsFactoryClass);
-                if (factory instanceof TilesApplicationContextAware) {
-                    ((TilesApplicationContextAware) factory).setApplicationContext(applicationContext);
-                }
-                BeanWrapper bw = PropertyAccessorFactory.forBeanPropertyAccess(factory);
-            
-                if (bw.isWritableProperty("localeResolver")) {
-                    bw.setPropertyValue("localeResolver", resolver);
-                }
-                if (bw.isWritableProperty("definitionDAO")) {
-                    bw.setPropertyValue("definitionDAO",
-                            createLocaleDefinitionDao(applicationContext, contextFactory, resolver));
-                }
-                if (factory instanceof Refreshable) {
-                    ((Refreshable) factory).refresh();
-                }
-                return factory;
-                
-            }
-            
-            return super.createDefinitionsFactory(applicationContext, contextFactory, resolver);
-            
-        }
-
-        
-        
-        @Override
-        protected PreparerFactory createPreparerFactory(
-                final TilesApplicationContext applicationContext,
-                final TilesRequestContextFactory contextFactory) {
-            
-            final Class<? extends PreparerFactory> preparerFactoryClass =
-                    TilesConfigurerSuperClassIntegration.getPreparerFactoryClass(this.configurer);
-            
-            if (preparerFactoryClass != null) {
-                return BeanUtils.instantiate(preparerFactoryClass);
-            }
-
-            return super.createPreparerFactory(applicationContext, contextFactory);
-            
-        }
-
-        
-        
-        @Override
-        protected LocaleResolver createLocaleResolver(
-                final TilesApplicationContext applicationContext,
-                final TilesRequestContextFactory contextFactory) {
-            return new SpringLocaleResolver();
-        }
-
-
-
-        @Override
-        protected void registerAttributeRenderers(
-                final BasicRendererFactory rendererFactory,
-                final TilesApplicationContext applicationContext,
-                final TilesRequestContextFactory contextFactory,
-                final TilesContainer container,
-                final AttributeEvaluatorFactory attributeEvaluatorFactory) {
-
-            super.registerAttributeRenderers(rendererFactory, applicationContext,
-                    contextFactory, container, attributeEvaluatorFactory);
-
-            final TemplateEngine templateEngine = this.configurer.getTemplateEngine();
-            if (templateEngine == null) {
-                throw new ConfigurationException(
-                        "No Thymeleaf TemplateEngine bean set at Tiles Configurator");
-            }
-            
-            final SpringThymeleafAttributeRenderer thymeleafRenderer = new SpringThymeleafAttributeRenderer(templateEngine);
-            thymeleafRenderer.setApplicationContext(applicationContext);
-            thymeleafRenderer.setRequestContextFactory(contextFactory);
-            thymeleafRenderer.setAttributeEvaluatorFactory(attributeEvaluatorFactory);
-            rendererFactory.registerRenderer("thymeleaf", thymeleafRenderer);
-            
-        }
-        
-        
-        
-        
-   }
-
-
-
-   
    
 }
