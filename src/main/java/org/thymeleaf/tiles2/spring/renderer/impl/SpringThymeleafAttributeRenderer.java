@@ -17,12 +17,14 @@
  * 
  * =============================================================================
  */
-package org.thymeleaf.tiles2.web.startup;
+package org.thymeleaf.tiles2.spring.renderer.impl;
 
-import org.apache.tiles.startup.TilesInitializer;
-import org.apache.tiles.web.startup.AbstractTilesInitializerServlet;
-import org.thymeleaf.tiles2.startup.ThymeleafTilesInitializer;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 
+import org.apache.tiles.context.TilesRequestContext;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.tiles2.renderer.impl.AbstractThymeleafAttributeRenderer;
 
 
 
@@ -33,25 +35,27 @@ import org.thymeleaf.tiles2.startup.ThymeleafTilesInitializer;
  * @since 2.0.9
  *
  */
-public class ThymeleafTilesServlet 
-        extends AbstractTilesInitializerServlet {
+public class SpringThymeleafAttributeRenderer 
+        extends AbstractThymeleafAttributeRenderer {
 
     
-    private static final long serialVersionUID = 199240475754703844L;
+    private final TemplateEngine templateEngine;
     
     
-
-    public ThymeleafTilesServlet() {
+    public SpringThymeleafAttributeRenderer(final TemplateEngine templateEngine) {
         super();
+        this.templateEngine = templateEngine;
     }
-    
+
     
     
 
     @Override
-    protected TilesInitializer createTilesInitializer() {
-        return new ThymeleafTilesInitializer();
+    protected TemplateEngine getTemplateEngine(final String templateName,
+            final TilesRequestContext request, final HttpServletRequest httpServletRequest,
+            final ServletContext servletContext) {
+        return this.templateEngine;
     }
-
+    
     
 }

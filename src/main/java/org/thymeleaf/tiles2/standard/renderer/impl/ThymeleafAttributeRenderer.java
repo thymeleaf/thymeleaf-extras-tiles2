@@ -19,21 +19,13 @@
  */
 package org.thymeleaf.tiles2.standard.renderer.impl;
 
-import java.io.IOException;
-import java.io.Writer;
-
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.tiles.Attribute;
 import org.apache.tiles.context.TilesRequestContext;
-import org.apache.tiles.renderer.impl.AbstractBaseAttributeRenderer;
-import org.apache.tiles.servlet.context.ServletTilesRequestContext;
-import org.apache.tiles.servlet.context.ServletUtil;
 import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.WebContext;
+import org.thymeleaf.tiles2.renderer.impl.AbstractThymeleafAttributeRenderer;
 import org.thymeleaf.tiles2.standard.context.ThymeleafTilesServletUtils;
-import org.thymeleaf.util.Validate;
 
 
 
@@ -45,7 +37,7 @@ import org.thymeleaf.util.Validate;
  *
  */
 public class ThymeleafAttributeRenderer 
-        extends AbstractBaseAttributeRenderer {
+        extends AbstractThymeleafAttributeRenderer {
 
     
     
@@ -54,34 +46,13 @@ public class ThymeleafAttributeRenderer
     }
 
     
-    
-    
+
+
     @Override
-    public void write(final Object value, final Attribute attribute,
-            final TilesRequestContext request) throws IOException {
-
-        Validate.notNull(value, "Cannot render a null template");
-        Validate.isTrue((value instanceof String), 
-                "Cannot render a template that is not a String ('" + value.getClass().getName() +"')");
-
-        final String templateName = (String) value;
-        final Writer writer = request.getWriter();
-        
-        final ServletTilesRequestContext servletRequest = ServletUtil.getServletRequest(request);
-        final HttpServletRequest httpServletRequest = servletRequest.getRequest();
-
-        final ServletContext servletContext = httpServletRequest.getSession().getServletContext();
-        if (servletContext == null) {
-            throw new IllegalStateException("Cannot retrieve servlet context");
-        }
-        
-        final TemplateEngine templateEngine = 
-                ThymeleafTilesServletUtils.getTemplateEngine(servletContext);
-
-        final WebContext context = new WebContext(httpServletRequest, servletContext);
-
-        templateEngine.process(templateName, context, writer);
-        
+    protected TemplateEngine getTemplateEngine(final String templateName,
+            final TilesRequestContext request, final HttpServletRequest httpServletRequest,
+            final ServletContext servletContext) {
+        return ThymeleafTilesServletUtils.getTemplateEngine(servletContext);
     }
     
 

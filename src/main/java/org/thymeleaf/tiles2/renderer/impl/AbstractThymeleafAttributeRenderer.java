@@ -32,7 +32,6 @@ import org.apache.tiles.servlet.context.ServletTilesRequestContext;
 import org.apache.tiles.servlet.context.ServletUtil;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
-import org.thymeleaf.tiles2.context.ThymeleafTilesServletUtils;
 import org.thymeleaf.util.Validate;
 
 
@@ -44,12 +43,12 @@ import org.thymeleaf.util.Validate;
  * @since 2.0.9
  *
  */
-public class ThymeleafAttributeRenderer 
+public abstract class AbstractThymeleafAttributeRenderer 
         extends AbstractBaseAttributeRenderer {
 
     
     
-    public ThymeleafAttributeRenderer() {
+    public AbstractThymeleafAttributeRenderer() {
         super();
     }
 
@@ -76,13 +75,19 @@ public class ThymeleafAttributeRenderer
         }
         
         final TemplateEngine templateEngine = 
-                ThymeleafTilesServletUtils.getTemplateEngine(servletContext);
+                getTemplateEngine(templateName, request, httpServletRequest, servletContext);
 
         final WebContext context = new WebContext(httpServletRequest, servletContext);
 
         templateEngine.process(templateName, context, writer);
         
     }
+    
+    
+    
+    protected abstract TemplateEngine getTemplateEngine(
+            final String templateName, final TilesRequestContext request, 
+            final HttpServletRequest httpServletRequest, final ServletContext servletContext);
     
 
     
