@@ -226,6 +226,12 @@
     </dependency>
     <dependency>
       <groupId>org.apache.tiles</groupId>
+      <artifactId>tiles-template</artifactId>
+      <version>2.2.0</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.tiles</groupId>
       <artifactId>tiles-servlet</artifactId>
       <version>2.2.0</version>
       <scope>compile</scope>
