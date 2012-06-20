@@ -27,7 +27,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.util.ClassUtils;
 import org.springframework.web.servlet.view.tiles2.TilesConfigurer;
 import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.tiles2.spring.web.startup.SpringThymeleafTilesInitializer;
+import org.thymeleaf.tiles2.spring.web.startup.ThymeleafTilesInitializer;
 
 
 
@@ -39,7 +39,7 @@ import org.thymeleaf.tiles2.spring.web.startup.SpringThymeleafTilesInitializer;
  * @since 2.0.9
  *
  */
-public class SpringThymeleafTilesConfigurer 
+public class ThymeleafTilesConfigurer 
         extends TilesConfigurer
         implements ApplicationContextAware {
 
@@ -53,7 +53,7 @@ public class SpringThymeleafTilesConfigurer
     
 
 
-    public SpringThymeleafTilesConfigurer() {
+    public ThymeleafTilesConfigurer() {
         super();
         if (!tiles22Present) {
             throw new IllegalStateException(this.getClass().getSimpleName() + " requires Tiles version 2.2+");
@@ -97,7 +97,7 @@ public class SpringThymeleafTilesConfigurer
      */
     @Override
     protected TilesInitializer createTilesInitializer() {
-        return new SpringThymeleafTilesInitializer(this);
+        return new ThymeleafTilesInitializer(this);
     }
 
     

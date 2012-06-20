@@ -42,7 +42,7 @@ import org.thymeleaf.tiles2.web.renderer.AbstractThymeleafWebAttributeRenderer;
  * @since 2.0.9
  *
  */
-public class SpringThymeleafAttributeRenderer 
+public class ThymeleafAttributeRenderer 
         extends AbstractThymeleafWebAttributeRenderer {
 
     
@@ -50,7 +50,7 @@ public class SpringThymeleafAttributeRenderer
     private final TemplateEngine templateEngine;
     
     
-    public SpringThymeleafAttributeRenderer(
+    public ThymeleafAttributeRenderer(
             final LocaleResolverHolder localeResolverHolder, final ApplicationContext applicationContext, 
             final TemplateEngine templateEngine) {
         

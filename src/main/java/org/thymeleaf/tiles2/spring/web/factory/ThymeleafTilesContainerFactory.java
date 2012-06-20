@@ -49,8 +49,8 @@ import org.springframework.web.servlet.view.tiles2.TilesConfigurer;
 import org.thymeleaf.tiles2.factory.AbstractThymeleafTilesContainerFactory;
 import org.thymeleaf.tiles2.localeresolver.LocaleResolverHolder;
 import org.thymeleaf.tiles2.renderer.AbstractThymeleafAttributeRenderer;
-import org.thymeleaf.tiles2.spring.web.configurer.SpringThymeleafTilesConfigurer;
-import org.thymeleaf.tiles2.spring.web.renderer.SpringThymeleafAttributeRenderer;
+import org.thymeleaf.tiles2.spring.web.configurer.ThymeleafTilesConfigurer;
+import org.thymeleaf.tiles2.spring.web.renderer.ThymeleafAttributeRenderer;
 
 
 
@@ -61,15 +61,15 @@ import org.thymeleaf.tiles2.spring.web.renderer.SpringThymeleafAttributeRenderer
  * @since 2.0.9
  *
  */
-public class SpringThymeleafTilesContainerFactory 
+public class ThymeleafTilesContainerFactory 
         extends AbstractThymeleafTilesContainerFactory {
     
     
-    private final SpringThymeleafTilesConfigurer configurer;
+    private final ThymeleafTilesConfigurer configurer;
     
     
     
-    public SpringThymeleafTilesContainerFactory(final SpringThymeleafTilesConfigurer configurer) {
+    public ThymeleafTilesContainerFactory(final ThymeleafTilesConfigurer configurer) {
         super();
         this.configurer = configurer;
     }
@@ -234,7 +234,7 @@ public class SpringThymeleafTilesContainerFactory
     protected AbstractThymeleafAttributeRenderer createAttributeRenderer(
             final LocaleResolverHolder localeResolverHolder) {
         
-        return new SpringThymeleafAttributeRenderer(
+        return new ThymeleafAttributeRenderer(
                 localeResolverHolder, this.configurer.getApplicationContext(), this.configurer.getTemplateEngine());
         
     }

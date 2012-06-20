@@ -22,8 +22,8 @@ package org.thymeleaf.tiles2.spring.web.startup;
 import org.apache.tiles.TilesApplicationContext;
 import org.apache.tiles.factory.AbstractTilesContainerFactory;
 import org.apache.tiles.startup.AbstractTilesInitializer;
-import org.thymeleaf.tiles2.spring.web.configurer.SpringThymeleafTilesConfigurer;
-import org.thymeleaf.tiles2.spring.web.factory.SpringThymeleafTilesContainerFactory;
+import org.thymeleaf.tiles2.spring.web.configurer.ThymeleafTilesConfigurer;
+import org.thymeleaf.tiles2.spring.web.factory.ThymeleafTilesContainerFactory;
 
 
 
@@ -35,12 +35,12 @@ import org.thymeleaf.tiles2.spring.web.factory.SpringThymeleafTilesContainerFact
  * @since 2.0.9
  *
  */
-public class SpringThymeleafTilesInitializer extends AbstractTilesInitializer {
+public class ThymeleafTilesInitializer extends AbstractTilesInitializer {
         
-    private final SpringThymeleafTilesConfigurer configurer;
+    private final ThymeleafTilesConfigurer configurer;
 
     
-    public SpringThymeleafTilesInitializer(final SpringThymeleafTilesConfigurer configurer) {
+    public ThymeleafTilesInitializer(final ThymeleafTilesConfigurer configurer) {
         super();
         this.configurer = configurer;
     }
@@ -48,7 +48,7 @@ public class SpringThymeleafTilesInitializer extends AbstractTilesInitializer {
     
     @Override
     protected AbstractTilesContainerFactory createContainerFactory(final TilesApplicationContext context) {
-        return new SpringThymeleafTilesContainerFactory(this.configurer);
+        return new ThymeleafTilesContainerFactory(this.configurer);
     }
    
    
