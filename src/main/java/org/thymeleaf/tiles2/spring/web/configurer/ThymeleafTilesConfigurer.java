@@ -48,6 +48,7 @@ public class ThymeleafTilesConfigurer
             "org.apache.tiles.evaluator.AttributeEvaluatorFactory", TilesConfigurer.class.getClassLoader());
     
     
+    // TODO are these fields needed anymore?
     private TemplateEngine templateEngine = null; 
     private ApplicationContext applicationContext = null; 
     

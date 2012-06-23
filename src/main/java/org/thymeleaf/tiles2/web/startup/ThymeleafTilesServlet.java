@@ -17,12 +17,12 @@
  * 
  * =============================================================================
  */
-package org.thymeleaf.tiles2.standard.factory;
+package org.thymeleaf.tiles2.web.startup;
 
-import org.thymeleaf.tiles2.factory.AbstractThymeleafTilesContainerFactory;
-import org.thymeleaf.tiles2.localeresolver.LocaleResolverHolder;
-import org.thymeleaf.tiles2.renderer.AbstractThymeleafAttributeRenderer;
-import org.thymeleaf.tiles2.standard.renderer.ThymeleafAttributeRenderer;
+import org.apache.tiles.startup.TilesInitializer;
+import org.apache.tiles.web.startup.AbstractTilesInitializerServlet;
+import org.thymeleaf.tiles2.startup.ThymeleafTilesInitializer;
+
 
 
 
@@ -33,21 +33,25 @@ import org.thymeleaf.tiles2.standard.renderer.ThymeleafAttributeRenderer;
  * @since 2.0.9
  *
  */
-public class ThymeleafTilesContainerFactory 
-        extends AbstractThymeleafTilesContainerFactory {
+public class ThymeleafTilesServlet 
+        extends AbstractTilesInitializerServlet {
 
     
+    private static final long serialVersionUID = 199240475754703844L;
     
-    public ThymeleafTilesContainerFactory() {
+    
+
+    public ThymeleafTilesServlet() {
         super();
     }
+    
+    
+    
 
-    
-    
     @Override
-    protected AbstractThymeleafAttributeRenderer createAttributeRenderer(
-            final LocaleResolverHolder localeResolverHolder) {
-        return new ThymeleafAttributeRenderer(localeResolverHolder);
+    protected TilesInitializer createTilesInitializer() {
+        return new ThymeleafTilesInitializer();
     }
+
     
 }

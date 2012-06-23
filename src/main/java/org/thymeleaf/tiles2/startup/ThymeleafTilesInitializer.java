@@ -17,11 +17,12 @@
  * 
  * =============================================================================
  */
-package org.thymeleaf.tiles2.standard.web.startup;
+package org.thymeleaf.tiles2.startup;
 
-import org.apache.tiles.startup.TilesInitializer;
-import org.apache.tiles.web.startup.AbstractTilesListener;
-import org.thymeleaf.tiles2.standard.startup.ThymeleafTilesInitializer;
+import org.apache.tiles.TilesApplicationContext;
+import org.apache.tiles.factory.AbstractTilesContainerFactory;
+import org.apache.tiles.startup.AbstractTilesInitializer;
+import org.thymeleaf.tiles2.factory.ThymeleafTilesContainerFactory;
 
 
 
@@ -32,20 +33,21 @@ import org.thymeleaf.tiles2.standard.startup.ThymeleafTilesInitializer;
  * @since 2.0.9
  *
  */
-public class ThymeleafTilesListener 
-        extends AbstractTilesListener {
+public class ThymeleafTilesInitializer 
+        extends AbstractTilesInitializer {
 
     
     
-    public ThymeleafTilesListener() {
+    public ThymeleafTilesInitializer() {
         super();
     }
 
     
     
     @Override
-    protected TilesInitializer createTilesInitializer() {
-        return new ThymeleafTilesInitializer();
+    protected AbstractTilesContainerFactory createContainerFactory(
+            final TilesApplicationContext context) {
+        return new ThymeleafTilesContainerFactory();
     }
 
     

@@ -17,11 +17,7 @@
  * 
  * =============================================================================
  */
-package org.thymeleaf.tiles2.standard.web.startup;
-
-import org.apache.tiles.startup.TilesInitializer;
-import org.apache.tiles.web.startup.AbstractTilesInitializerServlet;
-import org.thymeleaf.tiles2.standard.startup.ThymeleafTilesInitializer;
+package org.thymeleaf.tiles2.naming;
 
 
 
@@ -33,25 +29,16 @@ import org.thymeleaf.tiles2.standard.startup.ThymeleafTilesInitializer;
  * @since 2.0.9
  *
  */
-public class ThymeleafTilesServlet 
-        extends AbstractTilesInitializerServlet {
+public final class ThymeleafRequestAttributeNaming {
+
+
+    public static final String TEMPLATE_ENGINE = "%%THYMELEAF_TEMPLATE_ENGINE%%";
+    public static final String CONTEXT = "%%THYMELEAF_CONTEXT%%";
 
     
-    private static final long serialVersionUID = 199240475754703844L;
-    
-    
-
-    public ThymeleafTilesServlet() {
+    private ThymeleafRequestAttributeNaming() {
         super();
     }
     
-    
-    
 
-    @Override
-    protected TilesInitializer createTilesInitializer() {
-        return new ThymeleafTilesInitializer();
-    }
-
-    
 }

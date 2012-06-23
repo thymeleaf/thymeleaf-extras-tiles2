@@ -21,6 +21,8 @@ package org.thymeleaf.tiles2.dialect.processor;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.Collections;
+import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -32,13 +34,15 @@ import org.apache.tiles.servlet.context.ServletUtil;
 import org.apache.tiles.template.DefaultAttributeResolver;
 import org.apache.tiles.template.InsertAttributeModel;
 import org.thymeleaf.Arguments;
+import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.IContext;
 import org.thymeleaf.context.IWebContext;
 import org.thymeleaf.dom.Element;
+import org.thymeleaf.dom.Macro;
+import org.thymeleaf.dom.Node;
 import org.thymeleaf.exceptions.ConfigurationException;
 import org.thymeleaf.exceptions.TemplateProcessingException;
-import org.thymeleaf.processor.ProcessorResult;
-import org.thymeleaf.processor.attr.AbstractAttrProcessor;
+import org.thymeleaf.processor.attr.AbstractChildrenModifierAttrProcessor;
 
 
 
@@ -49,7 +53,9 @@ import org.thymeleaf.processor.attr.AbstractAttrProcessor;
  * @since 2.0.9
  *
  */
-public class InsertAttributeAttrProcessor extends AbstractAttrProcessor {
+public class InsertAttributeAttrProcessor
+        extends AbstractChildrenModifierAttrProcessor {
+    
 
     public static final String ATTR_NAME = "insert-attribute";
     public static final int PRECEDENCE = 100;
@@ -78,8 +84,8 @@ public class InsertAttributeAttrProcessor extends AbstractAttrProcessor {
     
 
     @Override
-    protected ProcessorResult processAttribute(final Arguments arguments,
-            final Element element, final String attributeName) {
+    protected List<Node> getModifiedChildren(final Arguments arguments,
+            final Element element, String attributeName) {
 
         final String attributeValue = element.getAttributeValue(attributeName);
         
@@ -107,23 +113,30 @@ public class InsertAttributeAttrProcessor extends AbstractAttrProcessor {
         final String name = attributeValue;
         final Attribute value = null;
         
+        final TemplateEngine templateEngine = TemplateEngine.threadTemplateEngine();
         final StringWriter writer = new StringWriter();
         
         try {
             this.model.execute(
-                    tilesContainer, ignore, preparer, role, defaultValue, defaultValueRole, defaultValueType, name, value, request, response);
+                    tilesContainer, ignore, preparer, 
+                    role, defaultValue, defaultValueRole, 
+                    defaultValueType, name, value,
+                    templateEngine, context,
+                    request, response, writer);
         } catch (final IOException e)  {
             throw new TemplateProcessingException(
                     "Error while processing Tiles attribute \"" + name + "\"", e);
         }
         
         final String templateResult = writer.toString();
-System.out.println("THIS IS THE RESULT: " + templateResult);
-//        final Macro macro = new Macro(templateResult);
         
-        return ProcessorResult.OK;
+        final Macro macroNode = new Macro(templateResult);
+        
+        return Collections.singletonList((Node)macroNode);
         
     }
+
+
 
     
     

@@ -19,16 +19,31 @@
  */
 package org.thymeleaf.tiles2.spring.web.view;
 
+import java.util.Locale;
 import java.util.Map;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.tiles.TilesApplicationContext;
+import org.apache.tiles.TilesContainer;
+import org.apache.tiles.context.TilesRequestContext;
+import org.apache.tiles.impl.BasicTilesContainer;
+import org.apache.tiles.servlet.context.ServletTilesApplicationContext;
+import org.apache.tiles.servlet.context.ServletTilesRequestContext;
+import org.apache.tiles.servlet.context.ServletUtil;
+import org.springframework.web.servlet.support.JstlUtils;
 import org.springframework.web.servlet.support.RequestContext;
+import org.springframework.web.servlet.support.RequestContextUtils;
 import org.springframework.web.servlet.view.AbstractTemplateView;
-import org.springframework.web.servlet.view.tiles2.TilesView;
+import org.springframework.web.servlet.view.AbstractUrlBasedView;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.IWebContext;
+import org.thymeleaf.spring3.context.SpringWebContext;
 import org.thymeleaf.spring3.naming.SpringContextVariableNames;
+import org.thymeleaf.tiles2.spring.web.configurer.ThymeleafTilesConfigurer;
 
 
 
@@ -39,7 +54,7 @@ import org.thymeleaf.spring3.naming.SpringContextVariableNames;
  * @since 2.0.9
  *
  */
-public class ThymeleafTilesView extends TilesView {
+public class ThymeleafTilesView extends AbstractUrlBasedView {
     
     
     
@@ -50,14 +65,38 @@ public class ThymeleafTilesView extends TilesView {
 
     
     
+
+
+    // TODO Shouldn't we implement this method better?
+    @Override
+    public boolean checkResource(final Locale locale) throws Exception {
+        TilesContainer container = ServletUtil.getContainer(getServletContext());
+        if (!(container instanceof BasicTilesContainer)) {
+            // Cannot check properly - let's assume it's there.
+            return true;
+        }
+        BasicTilesContainer basicContainer = (BasicTilesContainer) container;
+        TilesApplicationContext appContext = new ServletTilesApplicationContext(getServletContext());
+        TilesRequestContext requestContext = new ServletTilesRequestContext(appContext, null, null) {
+            @Override
+            public Locale getRequestLocale() {
+                return locale;
+            }
+        };
+        return (basicContainer.getDefinitionsFactory().getDefinition(getUrl(), requestContext) != null);
+    }
+    
+
+    
     
     @Override
     protected void renderMergedOutputModel(final Map<String, Object> model,
             final HttpServletRequest request, final HttpServletResponse response)
             throws Exception {
 
+        ServletContext servletContext = getServletContext();
         final RequestContext requestContext = 
-                new RequestContext(request, response, getServletContext(), model);
+                new RequestContext(request, response, servletContext, model);
         final String specifiedRequestContextAttribute = getRequestContextAttribute();
         
         // For compatibility with ThymeleafView
@@ -78,7 +117,28 @@ public class ThymeleafTilesView extends TilesView {
             response.setContentType(DEFAULT_CONTENT_TYPE);
         }
         
-        super.renderMergedOutputModel(model, request, response);
+
+        TilesContainer container = ServletUtil.getContainer(servletContext);
+        if (container == null) {
+            throw new ServletException(
+                    "Tiles container is not initialized. " +
+                    "Have you added a " + ThymeleafTilesConfigurer.class.getSimpleName() + " to " +
+            		"your web application context?");
+        }
+
+        exposeModelAsRequestAttributes(model, request);
+        JstlUtils.exposeLocalizationContext(new RequestContext(request, servletContext));
+
+        // TODO Maybe this means we should be using a specific view resolver?
+        final TemplateEngine templateEngine = TemplateEngine.threadTemplateEngine();
+        final Locale locale = RequestContextUtils.getLocale(request);
+        
+        final IWebContext context = 
+                new SpringWebContext(request, response, servletContext , 
+                        locale, model, getApplicationContext());
+        
+        
+        container.render(getUrl(), templateEngine, context, request, response, response.getWriter());
         
     }
     

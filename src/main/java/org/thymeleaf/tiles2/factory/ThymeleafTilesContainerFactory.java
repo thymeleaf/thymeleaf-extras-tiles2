@@ -19,15 +19,17 @@
  */
 package org.thymeleaf.tiles2.factory;
 
+import java.util.List;
+
 import org.apache.tiles.TilesApplicationContext;
 import org.apache.tiles.TilesContainer;
+import org.apache.tiles.context.ChainedTilesRequestContextFactory;
 import org.apache.tiles.context.TilesRequestContextFactory;
 import org.apache.tiles.evaluator.AttributeEvaluatorFactory;
 import org.apache.tiles.factory.BasicTilesContainerFactory;
-import org.apache.tiles.locale.LocaleResolver;
 import org.apache.tiles.renderer.impl.BasicRendererFactory;
-import org.thymeleaf.tiles2.localeresolver.LocaleResolverHolder;
-import org.thymeleaf.tiles2.renderer.AbstractThymeleafAttributeRenderer;
+import org.thymeleaf.tiles2.context.ThymeleafTilesRequestContextFactory;
+import org.thymeleaf.tiles2.renderer.ThymeleafAttributeRenderer;
 
 
 
@@ -38,47 +40,15 @@ import org.thymeleaf.tiles2.renderer.AbstractThymeleafAttributeRenderer;
  * @since 2.0.9
  *
  */
-public abstract class AbstractThymeleafTilesContainerFactory 
+public class ThymeleafTilesContainerFactory 
         extends BasicTilesContainerFactory {
 
-    public static final String THYMELEAF_ATTRIBUTE_TYPE = "thymeleaf";
-    
-    private final LocaleResolverHolder localeResolverHolderObj;
     
     
-    public AbstractThymeleafTilesContainerFactory() {
+    public ThymeleafTilesContainerFactory() {
         super();
-        this.localeResolverHolderObj = new LocaleResolverHolder();
     }
 
-    
-    
-    
-    @Override
-    protected final LocaleResolver createLocaleResolver(
-            final TilesApplicationContext applicationContext,
-            final TilesRequestContextFactory contextFactory) {
-        
-        /*
-         * We intercept the initalization of the locale resolver so that we can use
-         * it at the thymeleaf attribute renderers.
-         */
-        
-        final LocaleResolver localeResolver =
-                createInterceptedLocaleResolver(applicationContext, contextFactory); 
-        this.localeResolverHolderObj.setLocaleResolver(localeResolver);
-        
-        return localeResolver;
-        
-    }
-
-    
-    
-    protected LocaleResolver createInterceptedLocaleResolver(
-            final TilesApplicationContext applicationContext,
-            final TilesRequestContextFactory contextFactory) {
-        return super.createLocaleResolver(applicationContext, contextFactory);
-    }
 
     
 
@@ -93,18 +63,34 @@ public abstract class AbstractThymeleafTilesContainerFactory
         super.registerAttributeRenderers(rendererFactory, applicationContext,
                 contextFactory, container, attributeEvaluatorFactory);
         
-        final AbstractThymeleafAttributeRenderer renderer = createAttributeRenderer(this.localeResolverHolderObj);
+        final ThymeleafAttributeRenderer renderer = new ThymeleafAttributeRenderer();
         renderer.setApplicationContext(applicationContext);
         renderer.setRequestContextFactory(contextFactory);
         renderer.setAttributeEvaluatorFactory(attributeEvaluatorFactory);
-        rendererFactory.registerRenderer(THYMELEAF_ATTRIBUTE_TYPE, renderer);
+        rendererFactory.registerRenderer(ThymeleafAttributeRenderer.THYMELEAF_ATTRIBUTE_TYPE, renderer);
+        
+    }
+
+
+
+
+    
+    
+    @Override
+    protected List<TilesRequestContextFactory> getTilesRequestContextFactoriesToBeChained(
+            final ChainedTilesRequestContextFactory parent) {
+
+        final List<TilesRequestContextFactory> factories = super.getTilesRequestContextFactoriesToBeChained(parent);
+        registerRequestContextFactory(
+                ThymeleafTilesRequestContextFactory.class.getName(),
+                factories, parent);
+        
+        return factories;
         
     }
 
     
 
-    
-    protected abstract AbstractThymeleafAttributeRenderer createAttributeRenderer(final LocaleResolverHolder localeResolverHolder);
     
     
 }
