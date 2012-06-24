@@ -55,7 +55,6 @@ public class ThymeleafTilesRequestContextFactory
     
     public ThymeleafTilesRequestContextFactory() {
         super();
-        System.out.println("CREATING!!!");
     }
     
     

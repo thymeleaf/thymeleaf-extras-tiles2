@@ -19,6 +19,7 @@
  */
 package org.thymeleaf.tiles2.spring.web.view;
 
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
@@ -27,22 +28,17 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.tiles.TilesApplicationContext;
 import org.apache.tiles.TilesContainer;
-import org.apache.tiles.context.TilesRequestContext;
-import org.apache.tiles.impl.BasicTilesContainer;
-import org.apache.tiles.servlet.context.ServletTilesApplicationContext;
-import org.apache.tiles.servlet.context.ServletTilesRequestContext;
 import org.apache.tiles.servlet.context.ServletUtil;
 import org.springframework.web.servlet.support.JstlUtils;
 import org.springframework.web.servlet.support.RequestContext;
-import org.springframework.web.servlet.support.RequestContextUtils;
 import org.springframework.web.servlet.view.AbstractTemplateView;
-import org.springframework.web.servlet.view.AbstractUrlBasedView;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.IWebContext;
+import org.thymeleaf.spring3.SpringTemplateEngine;
 import org.thymeleaf.spring3.context.SpringWebContext;
 import org.thymeleaf.spring3.naming.SpringContextVariableNames;
+import org.thymeleaf.spring3.view.ThymeleafView;
 import org.thymeleaf.tiles2.spring.web.configurer.ThymeleafTilesConfigurer;
 
 
@@ -54,7 +50,7 @@ import org.thymeleaf.tiles2.spring.web.configurer.ThymeleafTilesConfigurer;
  * @since 2.0.9
  *
  */
-public class ThymeleafTilesView extends AbstractUrlBasedView {
+public class ThymeleafTilesView extends ThymeleafView {
     
     
     
@@ -66,98 +62,126 @@ public class ThymeleafTilesView extends AbstractUrlBasedView {
     
     
 
-
-    // TODO Shouldn't we implement this method better?
-    @Override
-    public boolean checkResource(final Locale locale) throws Exception {
-        TilesContainer container = ServletUtil.getContainer(getServletContext());
-        if (!(container instanceof BasicTilesContainer)) {
-            // Cannot check properly - let's assume it's there.
-            return true;
-        }
-        BasicTilesContainer basicContainer = (BasicTilesContainer) container;
-        TilesApplicationContext appContext = new ServletTilesApplicationContext(getServletContext());
-        TilesRequestContext requestContext = new ServletTilesRequestContext(appContext, null, null) {
-            @Override
-            public Locale getRequestLocale() {
-                return locale;
-            }
-        };
-        return (basicContainer.getDefinitionsFactory().getDefinition(getUrl(), requestContext) != null);
-    }
-    
-
-    
-    
-    @Override
-    protected void renderMergedOutputModel(final Map<String, Object> model,
-            final HttpServletRequest request, final HttpServletResponse response)
+    public void render(final Map<String, ?> model, final HttpServletRequest request, final HttpServletResponse response) 
             throws Exception {
 
-        ServletContext servletContext = getServletContext();
-        final RequestContext requestContext = 
-                new RequestContext(request, response, servletContext, model);
-        final String specifiedRequestContextAttribute = getRequestContextAttribute();
-        
-        // For compatibility with ThymeleafView
-        addRequestContextAsVariable(model, SpringContextVariableNames.SPRING_REQUEST_CONTEXT, requestContext);
-        // For compatibility with AbstractTemplateView
-        addRequestContextAsVariable(model, AbstractTemplateView.SPRING_MACRO_REQUEST_CONTEXT_ATTRIBUTE, requestContext);
-        // For compatibility with other scenarios, as configured by the user
-        if (specifiedRequestContextAttribute != null) {
-            addRequestContextAsVariable(model, specifiedRequestContextAttribute, requestContext);
+        final ServletContext servletContext = getServletContext();
+
+        if (getTemplateName() == null) {
+            throw new IllegalArgumentException("Property 'templateName' is required");
+        }
+        if (getLocale() == null) {
+            throw new IllegalArgumentException("Property 'locale' is required");
+        }
+        if (getTemplateEngine() == null) {
+            throw new IllegalArgumentException("Property 'templateEngine' is required");
         }
         
+        final Map<String, Object> mergedModel = new HashMap<String, Object>();
+        
+        final Map<String, Object> staticVariables = this.getStaticVariables();
+        if (staticVariables != null) {
+            mergedModel.putAll(staticVariables);
+        }
+        if (model != null) {
+            mergedModel.putAll(model);
+        }
+
+        
+        final RequestContext requestContext = 
+                new RequestContext(request, response, servletContext, mergedModel);
+        
+        // For compatibility with ThymeleafView
+        addRequestContextAsVariable(mergedModel, SpringContextVariableNames.SPRING_REQUEST_CONTEXT, requestContext);
+        // For compatibility with AbstractTemplateView
+        addRequestContextAsVariable(mergedModel, AbstractTemplateView.SPRING_MACRO_REQUEST_CONTEXT_ATTRIBUTE, requestContext);
+
+        
+        final IWebContext context = 
+                new SpringWebContext(request, response, servletContext , getLocale(), mergedModel, getApplicationContext());
+        
+        final TemplateEngine viewTemplateEngine = getTemplateEngine();
         
         final String templateContentType = getContentType();
+        final Locale templateLocale = getLocale();
+        final String templateCharacterEncoding = getCharacterEncoding();
 
+        response.setLocale(templateLocale);
         if (templateContentType != null) {
             response.setContentType(templateContentType);
         } else {
             response.setContentType(DEFAULT_CONTENT_TYPE);
         }
+        if (templateCharacterEncoding != null) {
+            response.setCharacterEncoding(templateCharacterEncoding);
+        }
         
-
         TilesContainer container = ServletUtil.getContainer(servletContext);
         if (container == null) {
             throw new ServletException(
                     "Tiles container is not initialized. " +
                     "Have you added a " + ThymeleafTilesConfigurer.class.getSimpleName() + " to " +
-            		"your web application context?");
+                    "your web application context?");
         }
 
+        
         exposeModelAsRequestAttributes(model, request);
-        JstlUtils.exposeLocalizationContext(new RequestContext(request, servletContext));
+        JstlUtils.exposeLocalizationContext(requestContext);
+        
+        
+        container.render(getTemplateName(), viewTemplateEngine, context, request, response, response.getWriter());
+        
+    }
 
-        // TODO Maybe this means we should be using a specific view resolver?
-        final TemplateEngine templateEngine = TemplateEngine.threadTemplateEngine();
-        final Locale locale = RequestContextUtils.getLocale(request);
-        
-        final IWebContext context = 
-                new SpringWebContext(request, response, servletContext , 
-                        locale, model, getApplicationContext());
-        
-        
-        container.render(getUrl(), templateEngine, context, request, response, response.getWriter());
-        
+
+
+
+    @Override
+    protected Locale getLocale() {
+        return super.getLocale();
+    }
+
+
+    @Override
+    protected void setLocale(final Locale locale) {
+        super.setLocale(locale);
+    }
+
+
+    @Override
+    protected SpringTemplateEngine getTemplateEngine() {
+        return super.getTemplateEngine();
+    }
+
+
+    @Override
+    protected void setTemplateEngine(final SpringTemplateEngine templateEngine) {
+        super.setTemplateEngine(templateEngine);
+    }
+
+
+    @Override
+    protected boolean isContentTypeSet() {
+        return super.isContentTypeSet();
     }
     
     
 
-    private static void addRequestContextAsVariable(
-            final Map<String,Object> model, final String variableName, final RequestContext requestContext) 
-            throws ServletException {
+    
+    protected void exposeModelAsRequestAttributes(final Map<String, ?> model, final HttpServletRequest request) 
+                throws Exception {
         
-        if (model.containsKey(variableName)) {
-            throw new ServletException(
-                    "Cannot expose request context in model attribute '" + variableName +
-                    "' because of an existing model object of the same name");
+        for (final Map.Entry<String, ?> entry : model.entrySet()) {
+            final String modelName = entry.getKey();
+            final Object modelValue = entry.getValue();
+            if (modelValue != null) {
+                request.setAttribute(modelName, modelValue);
+            } else {
+                request.removeAttribute(modelName);
+            }
         }
-        model.put(variableName, requestContext);
         
     }
-    
-
 
     
     
