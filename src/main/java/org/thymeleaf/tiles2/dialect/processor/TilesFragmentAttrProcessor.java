@@ -17,57 +17,30 @@
  * 
  * =============================================================================
  */
-package org.thymeleaf.tiles2.dialect;
+package org.thymeleaf.tiles2.dialect.processor;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
-
-import org.thymeleaf.dialect.AbstractDialect;
-import org.thymeleaf.processor.IProcessor;
-import org.thymeleaf.tiles2.dialect.processor.TilesFragmentAttrProcessor;
-import org.thymeleaf.tiles2.dialect.processor.TilesIncludeAttrProcessor;
-
-
+import org.thymeleaf.processor.attr.AbstractNoOpAttrProcessor;
 
 /**
  * 
  * @author Daniel Fern&aacute;ndez
  * 
  * @since 2.0.9
- *
+ * 
  */
-public class TilesDialect extends AbstractDialect {
+public class TilesFragmentAttrProcessor 
+            extends AbstractNoOpAttrProcessor {
 
-    public static final String DEFAULT_PREFIX = "tiles";
-    
-    
-    public TilesDialect() {
-        super();
+    public static final int ATTR_PRECEDENCE = 1500;
+    public static final String ATTR_NAME = "fragment";
+
+    public TilesFragmentAttrProcessor() {
+        super(ATTR_NAME);
     }
-
-    
-    
-    public String getPrefix() {
-        return DEFAULT_PREFIX;
-    }
-
-    
-    public boolean isLenient() {
-        return false;
-    }
-
-
 
     @Override
-    public Set<IProcessor> getProcessors() {
-        final Set<IProcessor> processors = new LinkedHashSet<IProcessor>();
-        processors.add(new TilesIncludeAttrProcessor());
-        processors.add(new TilesFragmentAttrProcessor());
-        return processors;
+    public int getPrecedence() {
+        return ATTR_PRECEDENCE;
     }
 
-    
-    
-    
-    
 }

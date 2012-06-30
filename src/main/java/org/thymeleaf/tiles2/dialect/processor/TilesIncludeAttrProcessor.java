@@ -53,7 +53,7 @@ import org.thymeleaf.processor.attr.AbstractChildrenModifierAttrProcessor;
  * @since 2.0.9
  *
  */
-public class InsertAttributeAttrProcessor
+public class TilesIncludeAttrProcessor
         extends AbstractChildrenModifierAttrProcessor {
     
 
@@ -68,7 +68,7 @@ public class InsertAttributeAttrProcessor
     
     
     
-    public InsertAttributeAttrProcessor() {
+    public TilesIncludeAttrProcessor() {
         super(ATTR_NAME);
     }
 

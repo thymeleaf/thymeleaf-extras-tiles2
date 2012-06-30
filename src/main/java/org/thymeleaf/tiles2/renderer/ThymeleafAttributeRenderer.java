@@ -31,8 +31,13 @@ import org.apache.tiles.impl.InvalidTemplateException;
 import org.apache.tiles.renderer.impl.AbstractBaseAttributeRenderer;
 import org.apache.tiles.servlet.context.ServletTilesRequestContext;
 import org.apache.tiles.servlet.context.ServletUtil;
+import org.thymeleaf.Configuration;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.IContext;
+import org.thymeleaf.expression.ExpressionEvaluationContext;
+import org.thymeleaf.fragment.FragmentAndTarget;
+import org.thymeleaf.fragment.IFragmentSpec;
+import org.thymeleaf.standard.fragment.StandardFragmentProcessor;
 import org.thymeleaf.tiles2.context.ThymeleafTilesRequestContext;
 import org.thymeleaf.tiles2.naming.ThymeleafRequestAttributeNaming;
 
@@ -49,6 +54,8 @@ public class ThymeleafAttributeRenderer extends AbstractBaseAttributeRenderer {
 
     
     public static final String THYMELEAF_ATTRIBUTE_TYPE = "thymeleaf";
+    
+
     
     
     
@@ -71,13 +78,11 @@ public class ThymeleafAttributeRenderer extends AbstractBaseAttributeRenderer {
                     "Cannot render a template that is not a String ('" + value.getClass().getName() +"')");
         }
 
-        final String templateName = (String) value;
-
         // Request could be Thymeleaf's own type or maybe a type from another
         // technology, but in that case we will need some attributes in the request
         // (the template engine and the context).
         ThymeleafTilesRequestContext requestContext = null;
-        
+
         if (!(tilesRequestContext instanceof ThymeleafTilesRequestContext)) {
 
             // If our request context is not a Thymeleaf one, could be because we are trying to render
@@ -127,11 +132,40 @@ public class ThymeleafAttributeRenderer extends AbstractBaseAttributeRenderer {
             
         }
         
+        final String templateSelector = (String) value;
+        
         final TemplateEngine templateEngine = requestContext.getTemplateEngine();
         final IContext context = requestContext.getContext();
         final Writer writer = requestContext.getWriter();
+
+        final FragmentAndTarget fragmentAndTarget = 
+                computeTemplateSelector(templateEngine, context, templateSelector);
+        final String templateName = fragmentAndTarget.getTemplateName();
+        final IFragmentSpec fragmentSpec = fragmentAndTarget.getFragmentSpec();
+
+        templateEngine.process(templateName, context, fragmentSpec, writer);
         
-        templateEngine.process(templateName, context, writer);
+    }
+    
+    
+    
+    private static FragmentAndTarget computeTemplateSelector(final TemplateEngine templateEngine, 
+            final IContext context, final String templateSelector) {
+
+        /*
+         * TODO DETECT IF THE STANDARD DIALECTS ARE PRESENT. IF NOT, DO NOT TRY TO PARSE
+         * THE SELECTOR AS A STANDARD FRAGMENT SPECIFICATION
+         */
+        
+        if (!templateEngine.isInitialized()) { 
+            templateEngine.initialize();
+        }
+        
+        final Configuration configuration = templateEngine.getConfiguration();
+        final ExpressionEvaluationContext evalContext = new ExpressionEvaluationContext(context);
+        
+        return StandardFragmentProcessor.computeStandardFragmentSpec(configuration, evalContext, 
+                templateSelector, null, "tiles:fragment");
         
     }
 
