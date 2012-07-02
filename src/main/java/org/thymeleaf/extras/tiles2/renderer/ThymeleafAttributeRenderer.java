@@ -34,11 +34,16 @@ import org.apache.tiles.servlet.context.ServletUtil;
 import org.thymeleaf.Configuration;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.IContext;
+import org.thymeleaf.dialect.IDialect;
 import org.thymeleaf.expression.ExpressionEvaluationContext;
 import org.thymeleaf.extras.tiles2.context.ThymeleafTilesRequestContext;
 import org.thymeleaf.extras.tiles2.naming.ThymeleafRequestAttributeNaming;
+import org.thymeleaf.fragment.DOMSelectorFragmentSpec;
+import org.thymeleaf.fragment.ElementAndAttributeNameFragmentSpec;
 import org.thymeleaf.fragment.FragmentAndTarget;
 import org.thymeleaf.fragment.IFragmentSpec;
+import org.thymeleaf.fragment.WholeFragmentSpec;
+import org.thymeleaf.standard.StandardDialect;
 import org.thymeleaf.standard.fragment.StandardFragmentProcessor;
 
 
@@ -54,7 +59,9 @@ public class ThymeleafAttributeRenderer extends AbstractBaseAttributeRenderer {
 
     
     public static final String THYMELEAF_ATTRIBUTE_TYPE = "thymeleaf";
+
     
+    private static final String SPRING_STANDARD_DIALECT_CLASS_NAME = "org.thymeleaf.spring3.dialect.SpringStandardDialect";
 
     
     
@@ -140,6 +147,7 @@ public class ThymeleafAttributeRenderer extends AbstractBaseAttributeRenderer {
 
         final FragmentAndTarget fragmentAndTarget = 
                 computeTemplateSelector(templateEngine, context, templateSelector);
+
         final String templateName = fragmentAndTarget.getTemplateName();
         final IFragmentSpec fragmentSpec = fragmentAndTarget.getFragmentSpec();
 
@@ -152,13 +160,12 @@ public class ThymeleafAttributeRenderer extends AbstractBaseAttributeRenderer {
     private static FragmentAndTarget computeTemplateSelector(final TemplateEngine templateEngine, 
             final IContext context, final String templateSelector) {
 
-        /*
-         * TODO DETECT IF THE STANDARD DIALECTS ARE PRESENT. IF NOT, DO NOT TRY TO PARSE
-         * THE SELECTOR AS A STANDARD FRAGMENT SPECIFICATION
-         */
-        
         if (!templateEngine.isInitialized()) { 
             templateEngine.initialize();
+        }
+        
+        if (!isStandardDialectPresent(templateEngine)) {
+            return computeNonStandardFragment(templateSelector);
         }
         
         final Configuration configuration = templateEngine.getConfiguration();
@@ -169,5 +176,61 @@ public class ThymeleafAttributeRenderer extends AbstractBaseAttributeRenderer {
         
     }
 
+    
+    
+    
+    private static boolean isStandardDialectPresent(final TemplateEngine templateEngine) {
         
+        try {
+            final Class<?> springStandardDialectClass = 
+                    Class.forName(SPRING_STANDARD_DIALECT_CLASS_NAME);
+            return isDialectPresent(templateEngine, springStandardDialectClass);
+        } catch (final ClassNotFoundException e) {
+            // nothing to do, just do other checks
+        }
+        
+        return isDialectPresent(templateEngine, StandardDialect.class);
+        
+    }
+ 
+
+    
+    private static boolean isDialectPresent(final TemplateEngine templateEngine, final Class<?> dialectClass) {
+        for (final IDialect dialect : templateEngine.getDialects()) {
+            if (dialectClass.isAssignableFrom(dialect.getClass())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    
+    
+    /*
+     * Syntax is like the standard one: 
+     *     TEMPLATE_NAME :: FRAGMENT_NAME
+     *     TEMPLATE_NAME :: [DOM_SELECTOR]
+     */
+    private static FragmentAndTarget computeNonStandardFragment(final String templateSelector) {
+        
+        final int separatorPos = templateSelector.indexOf("::");
+        
+        if (separatorPos < 0) {
+            return new FragmentAndTarget(templateSelector, WholeFragmentSpec.INSTANCE);
+        }
+        
+        final String templateName = templateSelector.substring(0, separatorPos).trim();
+        final String fragmentSelector = templateSelector.substring(separatorPos + 2).trim();
+        
+        if (fragmentSelector.length() > 2 && fragmentSelector.startsWith("[") && fragmentSelector.endsWith("]")) {
+            final String domSelector = fragmentSelector.substring(1, fragmentSelector.length() - 1);
+            return new FragmentAndTarget(templateName, new DOMSelectorFragmentSpec(domSelector));
+        }
+        
+        return new FragmentAndTarget(templateName, 
+                new ElementAndAttributeNameFragmentSpec(null, "tiles:fragment", fragmentSelector));
+        
+    }
+    
+    
 }
