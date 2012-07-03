@@ -21,6 +21,7 @@ package org.thymeleaf.extras.tiles2.renderer;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -35,8 +36,11 @@ import org.thymeleaf.Configuration;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.IContext;
 import org.thymeleaf.dialect.IDialect;
+import org.thymeleaf.exceptions.ConfigurationException;
 import org.thymeleaf.expression.ExpressionEvaluationContext;
 import org.thymeleaf.extras.tiles2.context.ThymeleafTilesRequestContext;
+import org.thymeleaf.extras.tiles2.dialect.TilesDialect;
+import org.thymeleaf.extras.tiles2.dialect.processor.TilesFragmentAttrProcessor;
 import org.thymeleaf.extras.tiles2.naming.ThymeleafRequestAttributeNaming;
 import org.thymeleaf.fragment.DOMSelectorFragmentSpec;
 import org.thymeleaf.fragment.ElementAndAttributeNameFragmentSpec;
@@ -59,7 +63,6 @@ public class ThymeleafAttributeRenderer extends AbstractBaseAttributeRenderer {
 
     
     public static final String THYMELEAF_ATTRIBUTE_TYPE = "thymeleaf";
-
     
     private static final String SPRING_STANDARD_DIALECT_CLASS_NAME = "org.thymeleaf.spring3.dialect.SpringStandardDialect";
 
@@ -165,14 +168,14 @@ public class ThymeleafAttributeRenderer extends AbstractBaseAttributeRenderer {
         }
         
         if (!isStandardDialectPresent(templateEngine)) {
-            return computeNonStandardFragment(templateSelector);
+            return computeNonStandardFragment(templateEngine, templateSelector);
         }
         
         final Configuration configuration = templateEngine.getConfiguration();
         final ExpressionEvaluationContext evalContext = new ExpressionEvaluationContext(context);
         
         return StandardFragmentProcessor.computeStandardFragmentSpec(configuration, evalContext, 
-                templateSelector, null, "tiles:fragment");
+                templateSelector, null, getFragmentAttributeName(templateEngine));
         
     }
 
@@ -207,11 +210,12 @@ public class ThymeleafAttributeRenderer extends AbstractBaseAttributeRenderer {
     
     
     /*
-     * Syntax is like the standard one: 
+     * Syntax is like the standard one, only without expression evaluation: 
      *     TEMPLATE_NAME :: FRAGMENT_NAME
      *     TEMPLATE_NAME :: [DOM_SELECTOR]
      */
-    private static FragmentAndTarget computeNonStandardFragment(final String templateSelector) {
+    private static FragmentAndTarget computeNonStandardFragment(
+            final TemplateEngine templateEngine, final String templateSelector) {
         
         final int separatorPos = templateSelector.indexOf("::");
         
@@ -228,9 +232,31 @@ public class ThymeleafAttributeRenderer extends AbstractBaseAttributeRenderer {
         }
         
         return new FragmentAndTarget(templateName, 
-                new ElementAndAttributeNameFragmentSpec(null, "tiles:fragment", fragmentSelector));
+                new ElementAndAttributeNameFragmentSpec(null, getFragmentAttributeName(templateEngine), fragmentSelector));
         
     }
     
+    
+    
+    private static String getTilesDialectPrefix(final TemplateEngine templateEngine) {
+        
+        for (final Map.Entry<String,IDialect> dialectByPrefix : templateEngine.getDialectsByPrefix().entrySet()) {
+            final IDialect dialect = dialectByPrefix.getValue();
+            if (TilesDialect.class.isAssignableFrom(dialect.getClass())) {
+                return dialectByPrefix.getKey();
+            }
+        }
+        
+        throw new ConfigurationException(
+                "Tiles dialect has not been found. In order to use Apache Tiles with Thymeleaf, you should configure " +
+                "the " + TilesDialect.class.getName() + " dialect at your Template Engine");
+        
+    }
+    
+    
+    private static String getFragmentAttributeName(final TemplateEngine templateEngine) {
+        // In most cases: "tiles:fragment"
+        return getTilesDialectPrefix(templateEngine) + ":" + TilesFragmentAttrProcessor.ATTR_NAME;
+    }
     
 }

@@ -111,6 +111,7 @@ public class ThymeleafTilesRequestContextFactory
 
 
 
+    @Deprecated
     public void init(final Map<String, String> configurationParameters) {
         // Nothing to do here.
     }
