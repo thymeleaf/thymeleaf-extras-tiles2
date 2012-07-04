@@ -79,20 +79,32 @@ public class ThymeleafTilesRequestContext extends TilesRequestContextWrapper {
         
     }
 
-    
-    
+
     @Override
     public void dispatch(final String path) throws IOException {
-        // These dispatch/include methods are called by TemplateAttributeRenderers
+        // These dispatch/include/forward methods are called by TemplateAttributeRenderers
         // when including a JSP attribute.
-        include(path);
+        
+        final Object[] parentRequestObjects = super.getRequestObjects();
+
+        // We know the enclosed request will have these reques objects
+        // (probably a ServletTilesRequestContext)
+        final HttpServletRequest request = (HttpServletRequest) parentRequestObjects[0];
+        final HttpServletResponse response = (HttpServletResponse) parentRequestObjects[1];
+        
+        if (response.isCommitted() || ServletUtil.isForceInclude(request)) {
+            include(path);
+        } else {
+            forward(path);
+        }
+        
     }
 
 
     
     @Override
     public void include(final String path) throws IOException {
-        // These dispatch/include methods are called by TemplateAttributeRenderers
+        // These dispatch/include/forward methods are called by TemplateAttributeRenderers
         // when including a JSP attribute.
         
         final Object[] parentRequestObjects = super.getRequestObjects();
@@ -123,6 +135,37 @@ public class ThymeleafTilesRequestContext extends TilesRequestContextWrapper {
 
 
 
+    
+    protected void forward(final String path) throws IOException {
+        // These dispatch/include/forward methods are called by TemplateAttributeRenderers
+        // when including a JSP attribute.
+        
+        final Object[] parentRequestObjects = super.getRequestObjects();
+
+        // We know the enclosed request will have these reques objects
+        // (probably a ServletTilesRequestContext)
+        final HttpServletRequest request = (HttpServletRequest) parentRequestObjects[0];
+        final HttpServletResponse response = (HttpServletResponse) parentRequestObjects[1];
+        
+        final RequestDispatcher requestDispatcher = request.getRequestDispatcher(path);
+        if (requestDispatcher == null) {
+            throw new IOException("Forwarded path \"" + path + "\" has no associated Request Dispatcher");
+        }
+
+        try {
+            
+            requestDispatcher.forward(
+                    request, new ExternalWriterHttpServletResponse(response, getPrintWriter()));
+            
+        } catch (final ServletException e) {
+            // Wraps servlet exception as an IOException, as preferred by Tiles
+            throw ServletUtil.wrapServletException(e, "Exception thrown while forwarding path \"" + path + "\".");
+        }
+        
+    }
+
+
+    
     
     @Override
     public PrintWriter getPrintWriter() throws IOException {

@@ -27,9 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.tiles.TilesApplicationContext;
-import org.apache.tiles.TilesContainer;
 import org.apache.tiles.awareness.TilesApplicationContextAware;
-import org.apache.tiles.context.ChainedTilesRequestContextFactory;
 import org.apache.tiles.context.TilesRequestContextFactory;
 import org.apache.tiles.definition.DefinitionsFactory;
 import org.apache.tiles.definition.DefinitionsFactoryException;
@@ -38,20 +36,15 @@ import org.apache.tiles.definition.Refreshable;
 import org.apache.tiles.definition.dao.BaseLocaleUrlDefinitionDAO;
 import org.apache.tiles.definition.dao.CachingLocaleUrlDefinitionDAO;
 import org.apache.tiles.definition.digester.DigesterDefinitionsReader;
-import org.apache.tiles.evaluator.AttributeEvaluatorFactory;
-import org.apache.tiles.factory.BasicTilesContainerFactory;
 import org.apache.tiles.impl.BasicTilesContainer;
 import org.apache.tiles.impl.mgmt.CachingTilesContainer;
 import org.apache.tiles.locale.LocaleResolver;
 import org.apache.tiles.preparer.PreparerFactory;
-import org.apache.tiles.renderer.impl.BasicRendererFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.PropertyAccessorFactory;
 import org.springframework.util.ClassUtils;
 import org.springframework.web.servlet.view.tiles2.TilesConfigurer;
-import org.thymeleaf.extras.tiles2.context.ThymeleafTilesRequestContextFactory;
-import org.thymeleaf.extras.tiles2.renderer.ThymeleafAttributeRenderer;
 import org.thymeleaf.extras.tiles2.spring.web.configurer.ThymeleafTilesConfigurer;
 
 
@@ -63,7 +56,8 @@ import org.thymeleaf.extras.tiles2.spring.web.configurer.ThymeleafTilesConfigure
  * @since 2.0.9
  *
  */
-public class ThymeleafTilesContainerFactory extends BasicTilesContainerFactory {
+public class ThymeleafTilesContainerFactory 
+        extends org.thymeleaf.extras.tiles2.factory.ThymeleafTilesContainerFactory {
     
     
     private final ThymeleafTilesConfigurer configurer;
@@ -217,43 +211,6 @@ public class ThymeleafTilesContainerFactory extends BasicTilesContainerFactory {
         
     }
 
-
-
-    @Override
-    protected void registerAttributeRenderers(
-            final BasicRendererFactory rendererFactory,
-            final TilesApplicationContext applicationContext,
-            final TilesRequestContextFactory contextFactory,
-            final TilesContainer container,
-            final AttributeEvaluatorFactory attributeEvaluatorFactory) {
-
-        super.registerAttributeRenderers(rendererFactory, applicationContext,
-                contextFactory, container, attributeEvaluatorFactory);
-        
-        final ThymeleafAttributeRenderer renderer = new ThymeleafAttributeRenderer();
-        renderer.setApplicationContext(applicationContext);
-        renderer.setRequestContextFactory(contextFactory);
-        renderer.setAttributeEvaluatorFactory(attributeEvaluatorFactory);
-        rendererFactory.registerRenderer(ThymeleafAttributeRenderer.THYMELEAF_ATTRIBUTE_TYPE, renderer);
-        
-    }
-    
-    
-    
-    
-    
-    @Override
-    protected List<TilesRequestContextFactory> getTilesRequestContextFactoriesToBeChained(
-            final ChainedTilesRequestContextFactory parent) {
-
-        final List<TilesRequestContextFactory> factories = super.getTilesRequestContextFactoriesToBeChained(parent);
-        registerRequestContextFactory(
-                ThymeleafTilesRequestContextFactory.class.getName(),
-                factories, parent);
-        
-        return factories;
-        
-    }
     
     
 }

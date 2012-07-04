@@ -29,7 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.tiles.Attribute;
 import org.apache.tiles.context.TilesRequestContext;
 import org.apache.tiles.impl.InvalidTemplateException;
-import org.apache.tiles.renderer.impl.AbstractBaseAttributeRenderer;
+import org.apache.tiles.renderer.impl.AbstractTypeDetectingAttributeRenderer;
 import org.apache.tiles.servlet.context.ServletTilesRequestContext;
 import org.apache.tiles.servlet.context.ServletUtil;
 import org.thymeleaf.Configuration;
@@ -59,10 +59,10 @@ import org.thymeleaf.standard.fragment.StandardFragmentProcessor;
  * @since 2.0.9
  *
  */
-public class ThymeleafAttributeRenderer extends AbstractBaseAttributeRenderer {
+public class ThymeleafAttributeRenderer 
+        extends AbstractTypeDetectingAttributeRenderer {
 
     
-    public static final String THYMELEAF_ATTRIBUTE_TYPE = "thymeleaf";
     
     private static final String SPRING_STANDARD_DIALECT_CLASS_NAME = "org.thymeleaf.spring3.dialect.SpringStandardDialect";
 
@@ -258,5 +258,27 @@ public class ThymeleafAttributeRenderer extends AbstractBaseAttributeRenderer {
         // In most cases: "tiles:fragment"
         return getTilesDialectPrefix(templateEngine) + ":" + TilesFragmentAttrProcessor.ATTR_NAME;
     }
+
+
+
+
+    
+    public boolean isRenderable(final Object value, final Attribute attribute,
+            final TilesRequestContext request) {
+        // Thyemeleaf cannot give a real answer to this as resources are made available to
+        // the processing core only by means of actually reading them (the type of resource is
+        // hidden by the ITemplateResolver / IResourceResolver), and it could be that
+        // there is no way of knowing if a resource is available or not before actually
+        // reading it.
+        //
+        // So this attribute renderer, when chained, should be always put at the end of the chain.
+        return true;
+    }
+
+
+
+
+
+    
     
 }
