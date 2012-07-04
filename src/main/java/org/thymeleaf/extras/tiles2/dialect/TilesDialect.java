@@ -25,6 +25,8 @@ import java.util.Set;
 import org.thymeleaf.dialect.AbstractDialect;
 import org.thymeleaf.extras.tiles2.dialect.processor.TilesFragmentAttrProcessor;
 import org.thymeleaf.extras.tiles2.dialect.processor.TilesIncludeAttrProcessor;
+import org.thymeleaf.extras.tiles2.dialect.processor.TilesReplaceAttrProcessor;
+import org.thymeleaf.extras.tiles2.dialect.processor.TilesStringAttrProcessor;
 import org.thymeleaf.processor.IProcessor;
 
 
@@ -61,8 +63,10 @@ public class TilesDialect extends AbstractDialect {
     @Override
     public Set<IProcessor> getProcessors() {
         final Set<IProcessor> processors = new LinkedHashSet<IProcessor>();
-        processors.add(new TilesIncludeAttrProcessor());
         processors.add(new TilesFragmentAttrProcessor());
+        processors.add(new TilesStringAttrProcessor());
+        processors.add(new TilesIncludeAttrProcessor());
+        processors.add(new TilesReplaceAttrProcessor());
         return processors;
     }
 
