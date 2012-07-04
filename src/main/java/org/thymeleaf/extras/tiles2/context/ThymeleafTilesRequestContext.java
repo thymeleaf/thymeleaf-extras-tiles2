@@ -222,10 +222,10 @@ public class ThymeleafTilesRequestContext extends TilesRequestContextWrapper {
             this.requestObjects[0] = this.templateEngine;
             this.requestObjects[1] = this.context;
 
-            for (int i = 2; i < parentRequestObjects.length; i++) {
-                this.requestObjects[i] = parentRequestObjects[i - 2];
+            for (int i = 0; i < parentRequestObjects.length; i++) {
+                this.requestObjects[i + 2] = parentRequestObjects[i];
             }
-            this.requestObjects[parentRequestObjects.length + 1] = this.writer;
+            this.requestObjects[this.requestObjects.length - 1] = this.writer;
             
         }
         
