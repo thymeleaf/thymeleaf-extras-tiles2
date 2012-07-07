@@ -32,6 +32,8 @@ import org.apache.tiles.context.TilesRequestContextFactory;
 import org.apache.tiles.servlet.context.ServletTilesRequestContext;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.IContext;
+import org.thymeleaf.context.IProcessingContext;
+import org.thymeleaf.context.ProcessingContext;
 import org.thymeleaf.extras.tiles2.naming.ThymeleafRequestAttributeNaming;
 
 
@@ -72,13 +74,16 @@ public class ThymeleafTilesRequestContextFactory
         
         if (requestItems.length == 5 &&
                 requestItems[0] instanceof TemplateEngine &&
-                requestItems[1] instanceof IContext &&
+                (requestItems[1] instanceof IContext || requestItems[1] instanceof IProcessingContext) &&
                 requestItems[2] instanceof HttpServletRequest &&
                 requestItems[3] instanceof HttpServletResponse &&
                 requestItems[4] instanceof Writer) {
 
             final TemplateEngine templateEngine = (TemplateEngine) requestItems[0];
-            final IContext context = (IContext) requestItems[1];
+            final IProcessingContext processingContext =
+                    (requestItems[1] instanceof IProcessingContext?
+                            (IProcessingContext) requestItems[1] :
+                            new ProcessingContext((IContext)requestItems[1]));
             final HttpServletRequest request = (HttpServletRequest) requestItems[2];
             final HttpServletResponse response = (HttpServletResponse) requestItems[3];
             final Writer writer = (Writer) requestItems[4];
@@ -89,14 +94,15 @@ public class ThymeleafTilesRequestContextFactory
              * a thymeleaf attribute.
              */
             request.setAttribute(ThymeleafRequestAttributeNaming.TEMPLATE_ENGINE, templateEngine);
-            request.setAttribute(ThymeleafRequestAttributeNaming.CONTEXT, context);
+            request.setAttribute(ThymeleafRequestAttributeNaming.PROCESSING_CONTEXT, processingContext);
+            request.setAttribute(ThymeleafRequestAttributeNaming.CONTEXT, processingContext.getContext());
             
             final TilesRequestContext enclosedRequest =
                     (this.parentContextFactory != null?
                             this.parentContextFactory.createRequestContext(tilesApplicationContext, request, response) :
                             new ServletTilesRequestContext(tilesApplicationContext, request, response));
 
-            return new ThymeleafTilesRequestContext(enclosedRequest, templateEngine, context, writer);
+            return new ThymeleafTilesRequestContext(enclosedRequest, templateEngine, processingContext, writer);
             
         } else if (requestItems.length == 1 && 
                        requestItems[0] instanceof ThymeleafTilesRequestContext) {

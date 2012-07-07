@@ -121,7 +121,7 @@ public class TilesIncludeAttrProcessor
                     tilesContainer, ignore, preparer, 
                     role, defaultValue, defaultValueRole, 
                     defaultValueType, name, value,
-                    templateEngine, context,
+                    templateEngine, arguments,
                     request, response, writer);
         } catch (final IOException e)  {
             throw new TemplateProcessingException(

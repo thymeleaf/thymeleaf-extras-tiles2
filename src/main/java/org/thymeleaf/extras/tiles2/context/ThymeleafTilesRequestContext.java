@@ -33,7 +33,7 @@ import org.apache.tiles.context.TilesRequestContextWrapper;
 import org.apache.tiles.servlet.context.ExternalWriterHttpServletResponse;
 import org.apache.tiles.servlet.context.ServletUtil;
 import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.IContext;
+import org.thymeleaf.context.IProcessingContext;
 import org.thymeleaf.util.Validate;
 
 
@@ -49,7 +49,7 @@ public class ThymeleafTilesRequestContext extends TilesRequestContextWrapper {
 
 
     private final TemplateEngine templateEngine;
-    private final IContext context;
+    private final IProcessingContext processingContext;
     private final Writer writer;
 
     // will be lazily initialized
@@ -62,19 +62,19 @@ public class ThymeleafTilesRequestContext extends TilesRequestContextWrapper {
 
     public ThymeleafTilesRequestContext(
             final TilesRequestContext enclosedRequest, 
-            final TemplateEngine templateEngine, final IContext context, final Writer writer) {
+            final TemplateEngine templateEngine, final IProcessingContext processingContext, final Writer writer) {
         
         super(enclosedRequest);
         
         Validate.notNull(templateEngine, 
                 "A TemplateEngine has not been specified as a Tiles request object");
-        Validate.notNull(context, 
-                "A Thymeleaf context has not been specified as a Tiles request object");
+        Validate.notNull(processingContext, 
+                "A Thymeleaf processing context has not been specified as a Tiles request object");
         Validate.notNull(writer, 
                 "A Writer has not been specified as a request Tiles object");
         
         this.templateEngine = templateEngine;
-        this.context = context;
+        this.processingContext = processingContext;
         this.writer = writer;
         
     }
@@ -189,8 +189,8 @@ public class ThymeleafTilesRequestContext extends TilesRequestContextWrapper {
 
     
     
-    public IContext getContext() {
-        return this.context;
+    public IProcessingContext getProcessingContext() {
+        return this.processingContext;
     }
     
     
@@ -220,7 +220,7 @@ public class ThymeleafTilesRequestContext extends TilesRequestContextWrapper {
             this.requestObjects = new Object[parentRequestObjects.length + 3];
 
             this.requestObjects[0] = this.templateEngine;
-            this.requestObjects[1] = this.context;
+            this.requestObjects[1] = this.processingContext;
 
             for (int i = 0; i < parentRequestObjects.length; i++) {
                 this.requestObjects[i + 2] = parentRequestObjects[i];

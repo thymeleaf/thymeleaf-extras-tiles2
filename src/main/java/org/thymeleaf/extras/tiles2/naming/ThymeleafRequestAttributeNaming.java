@@ -33,6 +33,7 @@ public final class ThymeleafRequestAttributeNaming {
 
 
     public static final String TEMPLATE_ENGINE = "%%THYMELEAF_TEMPLATE_ENGINE%%";
+    public static final String PROCESSING_CONTEXT = "%%THYMELEAF_PROCESSING_CONTEXT%%";
     public static final String CONTEXT = "%%THYMELEAF_CONTEXT%%";
 
     
