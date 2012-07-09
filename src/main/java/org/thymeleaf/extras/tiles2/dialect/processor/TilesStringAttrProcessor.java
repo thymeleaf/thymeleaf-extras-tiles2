@@ -49,8 +49,6 @@ import org.thymeleaf.processor.attr.AbstractChildrenModifierAttrProcessor;
 /**
  * 
  * @author Daniel Fern&aacute;ndez
- * 
- * @since 2.0.9
  *
  */
 public class TilesStringAttrProcessor

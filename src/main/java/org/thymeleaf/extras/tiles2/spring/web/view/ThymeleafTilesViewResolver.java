@@ -31,8 +31,6 @@ import org.thymeleaf.spring3.view.ThymeleafViewResolver;
 /**
  * 
  * @author Daniel Fern&aacute;ndez
- * 
- * @since 2.0.9
  *
  */
 public class ThymeleafTilesViewResolver extends ThymeleafViewResolver {

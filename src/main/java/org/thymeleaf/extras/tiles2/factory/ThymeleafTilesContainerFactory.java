@@ -32,6 +32,7 @@ import org.apache.tiles.renderer.TypeDetectingAttributeRenderer;
 import org.apache.tiles.renderer.impl.BasicRendererFactory;
 import org.apache.tiles.renderer.impl.ChainedDelegateAttributeRenderer;
 import org.thymeleaf.extras.tiles2.context.ThymeleafTilesRequestContextFactory;
+import org.thymeleaf.extras.tiles2.renderer.LocalVariableTemplateAttributeRenderer;
 import org.thymeleaf.extras.tiles2.renderer.ThymeleafAttributeRenderer;
 
 
@@ -39,8 +40,6 @@ import org.thymeleaf.extras.tiles2.renderer.ThymeleafAttributeRenderer;
 /**
  * 
  * @author Daniel Fern&aacute;ndez
- * 
- * @since 2.0.9
  *
  */
 public class ThymeleafTilesContainerFactory 
@@ -66,26 +65,69 @@ public class ThymeleafTilesContainerFactory
             final TilesContainer container,
             final AttributeEvaluatorFactory attributeEvaluatorFactory) {
 
-        super.registerAttributeRenderers(rendererFactory, applicationContext,
-                contextFactory, container, attributeEvaluatorFactory);
+        
+        rendererFactory.registerRenderer(STRING_RENDERER_NAME,
+                createStringAttributeRenderer(rendererFactory,
+                        applicationContext, contextFactory, container,
+                        attributeEvaluatorFactory));
+        
+        rendererFactory.registerRenderer(JSP_RENDERER_NAME,
+                createJspAttributeRenderer(rendererFactory,
+                        applicationContext, contextFactory, container,
+                        attributeEvaluatorFactory));
+        
+        rendererFactory.registerRenderer(DEFINITION_RENDERER_NAME,
+                createDefinitionAttributeRenderer(rendererFactory,
+                        applicationContext, contextFactory, container,
+                        attributeEvaluatorFactory));
 
-        /*
-         * Register the "template" attribute renderer (which is the JSP one) also as
-         * type "jsp".
-         */
-        rendererFactory.registerRenderer(
-                JSP_RENDERER_NAME, 
-                rendererFactory.getRenderer(TEMPLATE_RENDERER_NAME));
+        final AttributeRenderer thymeleafAttributeRenderer = 
+                createThymeleafAttributeRenderer(rendererFactory,
+                        applicationContext, contextFactory, container,
+                        attributeEvaluatorFactory);
+                        
+        rendererFactory.registerRenderer(THYMELEAF_RENDERER_NAME, thymeleafAttributeRenderer);
+        rendererFactory.registerRenderer(TEMPLATE_RENDERER_NAME, thymeleafAttributeRenderer);
+        
+    }
+
+
+
+    @SuppressWarnings("unused")
+    protected AttributeRenderer createJspAttributeRenderer(
+            final BasicRendererFactory rendererFactory,
+            final TilesApplicationContext applicationContext,
+            final TilesRequestContextFactory contextFactory,
+            final TilesContainer container,
+            final AttributeEvaluatorFactory attributeEvaluatorFactory) {
+        
+        final LocalVariableTemplateAttributeRenderer templateRenderer = new LocalVariableTemplateAttributeRenderer();
+        templateRenderer.setApplicationContext(applicationContext);
+        templateRenderer.setRequestContextFactory(contextFactory);
+        templateRenderer.setAttributeEvaluatorFactory(attributeEvaluatorFactory);
+        
+        return templateRenderer;
+        
+    }
+
+
+
+    @SuppressWarnings("unused")
+    protected AttributeRenderer createThymeleafAttributeRenderer(
+            final BasicRendererFactory rendererFactory,
+            final TilesApplicationContext applicationContext,
+            final TilesRequestContextFactory contextFactory,
+            final TilesContainer container,
+            final AttributeEvaluatorFactory attributeEvaluatorFactory) {
         
         final ThymeleafAttributeRenderer renderer = new ThymeleafAttributeRenderer();
         renderer.setApplicationContext(applicationContext);
         renderer.setRequestContextFactory(contextFactory);
         renderer.setAttributeEvaluatorFactory(attributeEvaluatorFactory);
-        rendererFactory.registerRenderer(THYMELEAF_RENDERER_NAME, renderer);
-        rendererFactory.registerRenderer(TEMPLATE_RENDERER_NAME, renderer);
+        
+        return renderer;
         
     }
-
 
 
 
@@ -119,6 +161,7 @@ public class ThymeleafTilesContainerFactory
 
 
 
+    
 
     @Override
     protected List<TilesRequestContextFactory> getTilesRequestContextFactoriesToBeChained(

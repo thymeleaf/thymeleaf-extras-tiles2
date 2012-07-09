@@ -46,8 +46,6 @@ import org.thymeleaf.spring3.view.ThymeleafView;
 /**
  * 
  * @author Daniel Fern&aacute;ndez
- * 
- * @since 2.0.9
  *
  */
 public class ThymeleafTilesView extends ThymeleafView {

@@ -25,8 +25,6 @@ package org.thymeleaf.extras.tiles2.naming;
 /**
  * 
  * @author Daniel Fern&aacute;ndez
- * 
- * @since 2.0.9
  *
  */
 public final class ThymeleafRequestAttributeNaming {

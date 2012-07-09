@@ -25,8 +25,6 @@ import org.thymeleaf.processor.attr.AbstractNoOpAttrProcessor;
  * 
  * @author Daniel Fern&aacute;ndez
  * 
- * @since 2.0.9
- * 
  */
 public class TilesFragmentAttrProcessor 
             extends AbstractNoOpAttrProcessor {

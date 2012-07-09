@@ -52,8 +52,6 @@ import org.thymeleaf.extras.tiles2.spring.web.configurer.ThymeleafTilesConfigure
 /**
  * 
  * @author Daniel Fern&aacute;ndez
- * 
- * @since 2.0.9
  *
  */
 public class ThymeleafTilesContainerFactory 

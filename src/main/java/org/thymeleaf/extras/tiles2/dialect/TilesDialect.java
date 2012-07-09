@@ -25,7 +25,7 @@ import java.util.Set;
 import org.thymeleaf.dialect.AbstractDialect;
 import org.thymeleaf.extras.tiles2.dialect.processor.TilesFragmentAttrProcessor;
 import org.thymeleaf.extras.tiles2.dialect.processor.TilesIncludeAttrProcessor;
-import org.thymeleaf.extras.tiles2.dialect.processor.TilesReplaceAttrProcessor;
+import org.thymeleaf.extras.tiles2.dialect.processor.TilesSubstituteByAttrProcessor;
 import org.thymeleaf.extras.tiles2.dialect.processor.TilesStringAttrProcessor;
 import org.thymeleaf.processor.IProcessor;
 
@@ -34,8 +34,6 @@ import org.thymeleaf.processor.IProcessor;
 /**
  * 
  * @author Daniel Fern&aacute;ndez
- * 
- * @since 2.0.9
  *
  */
 public class TilesDialect extends AbstractDialect {
@@ -66,7 +64,7 @@ public class TilesDialect extends AbstractDialect {
         processors.add(new TilesFragmentAttrProcessor());
         processors.add(new TilesStringAttrProcessor());
         processors.add(new TilesIncludeAttrProcessor());
-        processors.add(new TilesReplaceAttrProcessor());
+        processors.add(new TilesSubstituteByAttrProcessor());
         return processors;
     }
 

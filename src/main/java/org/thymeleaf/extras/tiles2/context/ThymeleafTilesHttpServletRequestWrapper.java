@@ -17,37 +17,37 @@
  * 
  * =============================================================================
  */
-package org.thymeleaf.extras.tiles2.localeresolver;
+package org.thymeleaf.extras.tiles2.context;
 
-import org.apache.tiles.locale.LocaleResolver;
+import java.util.Enumeration;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 
 
 
 /**
  * 
  * @author Daniel Fern&aacute;ndez
- * 
- * @since 2.0.9
  *
  */
-public final class LocaleResolverHolder  {
+public class ThymeleafTilesHttpServletRequestWrapper extends HttpServletRequestWrapper {
 
-    private LocaleResolver localeResolver;
     
-    
-    public LocaleResolverHolder() {
-        super();
+    public ThymeleafTilesHttpServletRequestWrapper(final HttpServletRequest request) {
+        super(request);
     }
 
-
-    public LocaleResolver getLocaleResolver() {
-        return this.localeResolver;
-    }
-
-
-    public void setLocaleResolver(final LocaleResolver localeResolver) {
-        this.localeResolver = localeResolver;
-    }
     
+    @Override
+    public Object getAttribute(final String name) {
+        return "LOLO";
+    }
+
+    @Override
+    public Enumeration getAttributeNames() {
+        return super.getAttributeNames();
+    }
+
     
 }

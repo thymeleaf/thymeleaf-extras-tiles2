@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -30,19 +31,16 @@ import org.apache.tiles.Attribute;
 import org.apache.tiles.context.TilesRequestContext;
 import org.apache.tiles.impl.InvalidTemplateException;
 import org.apache.tiles.renderer.impl.AbstractTypeDetectingAttributeRenderer;
-import org.apache.tiles.servlet.context.ServletTilesRequestContext;
-import org.apache.tiles.servlet.context.ServletUtil;
 import org.thymeleaf.Configuration;
 import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.IContext;
 import org.thymeleaf.context.IProcessingContext;
-import org.thymeleaf.context.ProcessingContext;
+import org.thymeleaf.context.IWebContext;
 import org.thymeleaf.dialect.IDialect;
 import org.thymeleaf.exceptions.ConfigurationException;
+import org.thymeleaf.extras.tiles2.context.ThymeleafTilesProcessingContext;
 import org.thymeleaf.extras.tiles2.context.ThymeleafTilesRequestContext;
 import org.thymeleaf.extras.tiles2.dialect.TilesDialect;
 import org.thymeleaf.extras.tiles2.dialect.processor.TilesFragmentAttrProcessor;
-import org.thymeleaf.extras.tiles2.naming.ThymeleafRequestAttributeNaming;
 import org.thymeleaf.fragment.DOMSelectorFragmentSpec;
 import org.thymeleaf.fragment.ElementAndAttributeNameFragmentSpec;
 import org.thymeleaf.fragment.FragmentAndTarget;
@@ -56,8 +54,6 @@ import org.thymeleaf.standard.fragment.StandardFragmentProcessor;
 /**
  * 
  * @author Daniel Fern&aacute;ndez
- * 
- * @since 2.0.9
  *
  */
 public class ThymeleafAttributeRenderer 
@@ -89,71 +85,24 @@ public class ThymeleafAttributeRenderer
                     "Cannot render a template that is not a String ('" + value.getClass().getName() +"')");
         }
 
-        // Request could be Thymeleaf's own type or maybe a type from another
-        // technology, but in that case we will need some attributes in the request
-        // (the template engine and the context).
-        ThymeleafTilesRequestContext requestContext = null;
-
-        if (!(tilesRequestContext instanceof ThymeleafTilesRequestContext)) {
-
-            // If our request context is not a Thymeleaf one, could be because we are trying to render
-            // a Thymeleaf attribute from a non-thymeleaf page, typically a JSP.
-            final ServletTilesRequestContext servletTilesRequestContext =
-                    ServletUtil.getServletRequest(tilesRequestContext);
-
-            final HttpServletRequest httpServletRequest = servletTilesRequestContext.getRequest();
-            final HttpServletResponse httpServletResponse = servletTilesRequestContext.getResponse();
-            
-            final TemplateEngine templateEngine = 
-                    (TemplateEngine) httpServletRequest.getAttribute(ThymeleafRequestAttributeNaming.TEMPLATE_ENGINE);
-            IProcessingContext processingContext = 
-                    (IProcessingContext) httpServletRequest.getAttribute(ThymeleafRequestAttributeNaming.PROCESSING_CONTEXT);
-
-            if (templateEngine == null) {
-                throw new InvalidTemplateException(
-                        "Cannot render template: If Tiles Request Context is not of class " + ThymeleafTilesRequestContext.class.getName() +
-                        " a TemplateEngine object must be present as a request attribute with name \"" + 
-                        ThymeleafRequestAttributeNaming.TEMPLATE_ENGINE + "\". Make sure the sequence of " +
-                		"request items you use when calling Tiles is: " +
-                        "(TemplateEngine, IContext, HttpServletRequest, HttpServletResponse, Writer)");
-            }
-            if (processingContext == null) {
-                final IContext context = 
-                        (IContext) httpServletRequest.getAttribute(ThymeleafRequestAttributeNaming.CONTEXT);
-                if (context == null) {
-                    throw new InvalidTemplateException(
-                            "Cannot render template: If Tiles Request Context is not of class " + ThymeleafTilesRequestContext.class.getName() +
-                            " either an IProcessingContext object must be present as a request attribute with name \"" + 
-                            ThymeleafRequestAttributeNaming.PROCESSING_CONTEXT + "\" or an IContext object must " +
-                    		"be present as a request attribute with name \"" + ThymeleafRequestAttributeNaming.CONTEXT + 
-                    		"\". Make sure the sequence of request items you use when calling Tiles is: " +
-                            "(TemplateEngine, [IProcessingContext|IContext], HttpServletRequest, HttpServletResponse, Writer)");
-                }
-                processingContext = new ProcessingContext(context);
-            }
-            if (httpServletResponse == null) {
-                throw new InvalidTemplateException(
-                        "Cannot render template: If Tiles Request Context is not of class " + ThymeleafTilesRequestContext.class.getName() +
-                        " an HttpServletResponse object must be specified (and in this request context, it is null). " +
-                        "Make sure the sequence of request items you use when calling Tiles is: " +
-                        "(TemplateEngine, IContext, HttpServletRequest, HttpServletResponse, Writer)");
-            }
-            
-            requestContext =
-                    new ThymeleafTilesRequestContext(
-                            tilesRequestContext, templateEngine, processingContext, tilesRequestContext.getWriter());
-            
-        } else {
-            
-            // Request context is of Thymeleaf's own type
-            requestContext = (ThymeleafTilesRequestContext) tilesRequestContext;
-            
-        }
+        
+        final ThymeleafTilesRequestContext requestContext = 
+                ThymeleafAttributeRendererUtils.normalizeRequestContext(tilesRequestContext);
         
         final String templateSelector = (String) value;
         
+        ThymeleafTilesProcessingContext processingContext = requestContext.getProcessingContext();
+        final IWebContext context = processingContext.getContext();
+        
+        final HttpServletRequest httpServletRequest = context.getHttpServletRequest();
+        final HttpServletResponse httpServletResponse = context.getHttpServletResponse();
+        final ServletContext servletContext = context.getServletContext();
+                
+        
         final TemplateEngine templateEngine = requestContext.getTemplateEngine();
-        final IProcessingContext processingContext = requestContext.getProcessingContext();
+        processingContext = 
+                processingContext.refresh(httpServletRequest, httpServletResponse, servletContext);
+        
         final Writer writer = requestContext.getWriter();
 
         final FragmentAndTarget fragmentAndTarget = 

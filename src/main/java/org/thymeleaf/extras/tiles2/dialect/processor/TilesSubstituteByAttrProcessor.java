@@ -42,6 +42,7 @@ import org.thymeleaf.dom.Macro;
 import org.thymeleaf.dom.Node;
 import org.thymeleaf.exceptions.ConfigurationException;
 import org.thymeleaf.exceptions.TemplateProcessingException;
+import org.thymeleaf.extras.tiles2.context.ThymeleafTilesProcessingContext;
 import org.thymeleaf.processor.attr.AbstractChildrenModifierAttrProcessor;
 
 
@@ -49,15 +50,13 @@ import org.thymeleaf.processor.attr.AbstractChildrenModifierAttrProcessor;
 /**
  * 
  * @author Daniel Fern&aacute;ndez
- * 
- * @since 2.0.9
  *
  */
-public class TilesReplaceAttrProcessor
+public class TilesSubstituteByAttrProcessor
         extends AbstractChildrenModifierAttrProcessor {
     
 
-    public static final String ATTR_NAME = "replace";
+    public static final String ATTR_NAME = "substituteby";
     public static final int PRECEDENCE = 100;
     
     
@@ -68,7 +67,7 @@ public class TilesReplaceAttrProcessor
     
     
     
-    public TilesReplaceAttrProcessor() {
+    public TilesSubstituteByAttrProcessor() {
         super(ATTR_NAME);
     }
 
@@ -98,6 +97,8 @@ public class TilesReplaceAttrProcessor
         }
         final IWebContext webContext = (IWebContext) context;
         
+        final ThymeleafTilesProcessingContext processingContext = new ThymeleafTilesProcessingContext(arguments);
+        
         final HttpServletRequest request = webContext.getHttpServletRequest();
         final HttpServletResponse response = webContext.getHttpServletResponse();
         final ServletContext servletContext = request.getSession().getServletContext();
@@ -121,7 +122,7 @@ public class TilesReplaceAttrProcessor
                     tilesContainer, ignore, preparer, 
                     role, defaultValue, defaultValueRole, 
                     defaultValueType, name, value,
-                    templateEngine, arguments,
+                    templateEngine, processingContext,
                     request, response, writer);
         } catch (final IOException e)  {
             throw new TemplateProcessingException(

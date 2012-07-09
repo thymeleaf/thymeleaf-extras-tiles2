@@ -27,13 +27,14 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.jsp.PageContext;
 
 import org.apache.tiles.context.TilesRequestContext;
 import org.apache.tiles.context.TilesRequestContextWrapper;
+import org.apache.tiles.jsp.context.JspUtil;
 import org.apache.tiles.servlet.context.ExternalWriterHttpServletResponse;
 import org.apache.tiles.servlet.context.ServletUtil;
 import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.IProcessingContext;
 import org.thymeleaf.util.Validate;
 
 
@@ -41,15 +42,13 @@ import org.thymeleaf.util.Validate;
 /**
  * 
  * @author Daniel Fern&aacute;ndez
- * 
- * @since 2.0.9
  *
  */
 public class ThymeleafTilesRequestContext extends TilesRequestContextWrapper {
 
 
     private final TemplateEngine templateEngine;
-    private final IProcessingContext processingContext;
+    private final ThymeleafTilesProcessingContext processingContext;
     private final Writer writer;
 
     // will be lazily initialized
@@ -61,8 +60,8 @@ public class ThymeleafTilesRequestContext extends TilesRequestContextWrapper {
     
 
     public ThymeleafTilesRequestContext(
-            final TilesRequestContext enclosedRequest, 
-            final TemplateEngine templateEngine, final IProcessingContext processingContext, final Writer writer) {
+            final TilesRequestContext enclosedRequest, final TemplateEngine templateEngine, 
+            final ThymeleafTilesProcessingContext processingContext, final Writer writer) {
         
         super(enclosedRequest);
         
@@ -76,43 +75,40 @@ public class ThymeleafTilesRequestContext extends TilesRequestContextWrapper {
         this.templateEngine = templateEngine;
         this.processingContext = processingContext;
         this.writer = writer;
-        
+
     }
 
 
     @Override
     public void dispatch(final String path) throws IOException {
-        // These dispatch/include/forward methods are called by TemplateAttributeRenderers
+        // These dispatch/include methods are called by TemplateAttributeRenderers
         // when including a JSP attribute.
-        
-        final Object[] parentRequestObjects = super.getRequestObjects();
-
-        // We know the enclosed request will have these reques objects
-        // (probably a ServletTilesRequestContext)
-        final HttpServletRequest request = (HttpServletRequest) parentRequestObjects[0];
-        final HttpServletResponse response = (HttpServletResponse) parentRequestObjects[1];
-        
-        if (response.isCommitted() || ServletUtil.isForceInclude(request)) {
-            include(path);
-        } else {
-            forward(path);
-        }
-        
+        include(path);
     }
 
 
     
     @Override
     public void include(final String path) throws IOException {
-        // These dispatch/include/forward methods are called by TemplateAttributeRenderers
+        // These dispatch/include methods are called by TemplateAttributeRenderers
         // when including a JSP attribute.
-        
-        final Object[] parentRequestObjects = super.getRequestObjects();
 
-        // We know the enclosed request will have these reques objects
-        // (probably a ServletTilesRequestContext)
-        final HttpServletRequest request = (HttpServletRequest) parentRequestObjects[0];
-        final HttpServletResponse response = (HttpServletResponse) parentRequestObjects[1];
+        final Object[] parentRequestObjects = super.getRequestObjects();
+        if (parentRequestObjects[0] instanceof PageContext) {
+            final PageContext pageContext = (PageContext) parentRequestObjects[0];
+            includeJsp(pageContext, path);
+        } else {
+            final HttpServletRequest request = (HttpServletRequest) parentRequestObjects[0];
+            final HttpServletResponse response = (HttpServletResponse) parentRequestObjects[1];
+            includeServlet(request, response, path);
+        }
+        
+    }
+
+
+    
+    public void includeServlet(final HttpServletRequest request, final HttpServletResponse response, final String path) 
+                throws IOException {
         
         ServletUtil.setForceInclude(request, true);
         
@@ -133,33 +129,17 @@ public class ThymeleafTilesRequestContext extends TilesRequestContextWrapper {
         
     }
 
-
-
     
-    protected void forward(final String path) throws IOException {
-        // These dispatch/include/forward methods are called by TemplateAttributeRenderers
-        // when including a JSP attribute.
+    
+    public void includeJsp(final PageContext pageContext, final String path) throws IOException {
         
-        final Object[] parentRequestObjects = super.getRequestObjects();
-
-        // We know the enclosed request will have these reques objects
-        // (probably a ServletTilesRequestContext)
-        final HttpServletRequest request = (HttpServletRequest) parentRequestObjects[0];
-        final HttpServletResponse response = (HttpServletResponse) parentRequestObjects[1];
+        JspUtil.setForceInclude(pageContext, true);
         
-        final RequestDispatcher requestDispatcher = request.getRequestDispatcher(path);
-        if (requestDispatcher == null) {
-            throw new IOException("Forwarded path \"" + path + "\" has no associated Request Dispatcher");
-        }
-
         try {
-            
-            requestDispatcher.forward(
-                    request, new ExternalWriterHttpServletResponse(response, getPrintWriter()));
-            
+            pageContext.include(path, false);
         } catch (final ServletException e) {
             // Wraps servlet exception as an IOException, as preferred by Tiles
-            throw ServletUtil.wrapServletException(e, "Exception thrown while forwarding path \"" + path + "\".");
+            throw ServletUtil.wrapServletException(e, "Exception thrown while including path \"" + path + "\".");
         }
         
     }
@@ -189,7 +169,7 @@ public class ThymeleafTilesRequestContext extends TilesRequestContextWrapper {
 
     
     
-    public IProcessingContext getProcessingContext() {
+    public ThymeleafTilesProcessingContext getProcessingContext() {
         return this.processingContext;
     }
     

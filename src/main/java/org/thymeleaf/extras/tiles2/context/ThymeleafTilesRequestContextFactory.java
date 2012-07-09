@@ -33,16 +33,15 @@ import org.apache.tiles.servlet.context.ServletTilesRequestContext;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.IContext;
 import org.thymeleaf.context.IProcessingContext;
-import org.thymeleaf.context.ProcessingContext;
+import org.thymeleaf.context.IWebContext;
 import org.thymeleaf.extras.tiles2.naming.ThymeleafRequestAttributeNaming;
+import org.thymeleaf.util.Validate;
 
 
 
 /**
  * 
  * @author Daniel Fern&aacute;ndez
- * 
- * @since 2.0.9
  *
  */
 public class ThymeleafTilesRequestContextFactory 
@@ -67,7 +66,7 @@ public class ThymeleafTilesRequestContextFactory
         
         // Will require 5 request objects:
         //   1. TemplateEngine
-        //   2. IContext
+        //   2. IContext | IProcessingContext
         //   3. HttpServletRequest
         //   4. HttpServletResponse
         //   5. Writer
@@ -80,19 +79,43 @@ public class ThymeleafTilesRequestContextFactory
                 requestItems[4] instanceof Writer) {
 
             final TemplateEngine templateEngine = (TemplateEngine) requestItems[0];
-            final IProcessingContext processingContext =
-                    (requestItems[1] instanceof IProcessingContext?
-                            (IProcessingContext) requestItems[1] :
-                            new ProcessingContext((IContext)requestItems[1]));
+            
+            ThymeleafTilesProcessingContext processingContext = null;
+            if (requestItems[1] instanceof IProcessingContext) {
+                if (requestItems[1] instanceof ThymeleafTilesProcessingContext) {
+                    processingContext = (ThymeleafTilesProcessingContext) requestItems[1];
+                } else {
+                    processingContext = new ThymeleafTilesProcessingContext((IProcessingContext) requestItems[1]);
+                }
+            } else if (requestItems[1] instanceof IContext) {
+                Validate.isTrue(requestItems[1] instanceof IWebContext,
+                        "Cannot create " + ThymeleafTilesProcessingContext.class.getSimpleName() + ": " + 
+                        "The specified context does not implement " + IWebContext.class.getName());
+                processingContext = new ThymeleafTilesProcessingContext((IWebContext)requestItems[1]);
+            } else {
+                // Can never happen
+                throw new IllegalArgumentException("Second request item should be IContext or IProcessingContext");
+            }
+            
             final HttpServletRequest request = (HttpServletRequest) requestItems[2];
             final HttpServletResponse response = (HttpServletResponse) requestItems[3];
             final Writer writer = (Writer) requestItems[4];
+
+            
+            /*
+             * Refresh the processing context in order to add any new request variables (and link
+             * to a new request/wrapper, if it exists)
+             */
+            processingContext = 
+                    processingContext.refresh(
+                            request, response, processingContext.getContext().getServletContext());
             
             /*
              * Prepare request by adding attributes for template engine and context,
              * just in case a template of a different kind (e.g. a JSP) tries to execute
              * a thymeleaf attribute.
              */
+            
             request.setAttribute(ThymeleafRequestAttributeNaming.TEMPLATE_ENGINE, templateEngine);
             request.setAttribute(ThymeleafRequestAttributeNaming.PROCESSING_CONTEXT, processingContext);
             request.setAttribute(ThymeleafRequestAttributeNaming.CONTEXT, processingContext.getContext());
@@ -101,7 +124,7 @@ public class ThymeleafTilesRequestContextFactory
                     (this.parentContextFactory != null?
                             this.parentContextFactory.createRequestContext(tilesApplicationContext, request, response) :
                             new ServletTilesRequestContext(tilesApplicationContext, request, response));
-
+            
             return new ThymeleafTilesRequestContext(enclosedRequest, templateEngine, processingContext, writer);
             
         } else if (requestItems.length == 1 && 

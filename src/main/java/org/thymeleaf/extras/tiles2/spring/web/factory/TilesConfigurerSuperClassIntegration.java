@@ -32,8 +32,6 @@ import org.thymeleaf.exceptions.ConfigurationException;
 /**
  * 
  * @author Daniel Fern&aacute;ndez
- * 
- * @since 2.0.9
  *
  */
 final class TilesConfigurerSuperClassIntegration {

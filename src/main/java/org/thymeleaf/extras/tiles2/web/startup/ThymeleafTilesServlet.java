@@ -29,8 +29,6 @@ import org.thymeleaf.extras.tiles2.startup.ThymeleafTilesInitializer;
 /**
  * 
  * @author Daniel Fern&aacute;ndez
- * 
- * @since 2.0.9
  *
  */
 public class ThymeleafTilesServlet 
