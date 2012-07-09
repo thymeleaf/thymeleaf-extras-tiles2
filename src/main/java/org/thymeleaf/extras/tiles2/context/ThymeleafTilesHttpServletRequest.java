@@ -19,10 +19,12 @@
  */
 package org.thymeleaf.extras.tiles2.context;
 
-import java.util.Enumeration;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
+
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.IProcessingContext;
+import org.thymeleaf.util.Validate;
 
 
 
@@ -31,23 +33,35 @@ import javax.servlet.http.HttpServletRequestWrapper;
  * @author Daniel Fern&aacute;ndez
  *
  */
-public class ThymeleafTilesHttpServletRequestWrapper extends HttpServletRequestWrapper {
+public class ThymeleafTilesHttpServletRequest extends HttpServletRequestWrapper {
 
+    private final TemplateEngine templateEngine;
+    private final IProcessingContext processingContext;
     
-    public ThymeleafTilesHttpServletRequestWrapper(final HttpServletRequest request) {
+    
+    
+    public ThymeleafTilesHttpServletRequest(final HttpServletRequest request,
+            final TemplateEngine templateEngine, final IProcessingContext processingContext) {
         super(request);
+        Validate.notNull(templateEngine, "Template Engine cannot be null");
+        Validate.notNull(processingContext, "Processing Context cannot be null");
+        this.templateEngine = templateEngine;
+        this.processingContext = processingContext;
     }
+
+
 
     
-    @Override
-    public Object getAttribute(final String name) {
-        return "LOLO";
+    public TemplateEngine getTemplateEngine() {
+        return this.templateEngine;
     }
 
-    @Override
-    public Enumeration getAttributeNames() {
-        return super.getAttributeNames();
+
+
+    public IProcessingContext getProcessingContext() {
+        return this.processingContext;
     }
+
 
     
 }

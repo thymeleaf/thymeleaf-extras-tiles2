@@ -23,10 +23,6 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.tiles.Attribute;
 import org.apache.tiles.context.TilesRequestContext;
 import org.apache.tiles.impl.InvalidTemplateException;
@@ -34,10 +30,8 @@ import org.apache.tiles.renderer.impl.AbstractTypeDetectingAttributeRenderer;
 import org.thymeleaf.Configuration;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.IProcessingContext;
-import org.thymeleaf.context.IWebContext;
 import org.thymeleaf.dialect.IDialect;
 import org.thymeleaf.exceptions.ConfigurationException;
-import org.thymeleaf.extras.tiles2.context.ThymeleafTilesProcessingContext;
 import org.thymeleaf.extras.tiles2.context.ThymeleafTilesRequestContext;
 import org.thymeleaf.extras.tiles2.dialect.TilesDialect;
 import org.thymeleaf.extras.tiles2.dialect.processor.TilesFragmentAttrProcessor;
@@ -85,24 +79,13 @@ public class ThymeleafAttributeRenderer
                     "Cannot render a template that is not a String ('" + value.getClass().getName() +"')");
         }
 
-        
         final ThymeleafTilesRequestContext requestContext = 
-                ThymeleafAttributeRendererUtils.normalizeRequestContext(tilesRequestContext);
+                (ThymeleafTilesRequestContext) tilesRequestContext;
         
         final String templateSelector = (String) value;
         
-        ThymeleafTilesProcessingContext processingContext = requestContext.getProcessingContext();
-        final IWebContext context = processingContext.getContext();
-        
-        final HttpServletRequest httpServletRequest = context.getHttpServletRequest();
-        final HttpServletResponse httpServletResponse = context.getHttpServletResponse();
-        final ServletContext servletContext = context.getServletContext();
-                
-        
         final TemplateEngine templateEngine = requestContext.getTemplateEngine();
-        processingContext = 
-                processingContext.refresh(httpServletRequest, httpServletResponse, servletContext);
-        
+        final IProcessingContext processingContext = requestContext.getProcessingContext();
         final Writer writer = requestContext.getWriter();
 
         final FragmentAndTarget fragmentAndTarget = 
@@ -110,7 +93,6 @@ public class ThymeleafAttributeRenderer
 
         final String templateName = fragmentAndTarget.getTemplateName();
         final IFragmentSpec fragmentSpec = fragmentAndTarget.getFragmentSpec();
-
 
         templateEngine.process(templateName, processingContext, fragmentSpec, writer);
         
@@ -233,9 +215,5 @@ public class ThymeleafAttributeRenderer
     }
 
 
-
-
-
-    
     
 }

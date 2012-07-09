@@ -17,8 +17,16 @@
  * 
  * =============================================================================
  */
-package org.thymeleaf.extras.tiles2.naming;
+package org.thymeleaf.extras.tiles2.context;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Writer;
+
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponseWrapper;
+
+import org.thymeleaf.util.Validate;
 
 
 
@@ -27,17 +35,24 @@ package org.thymeleaf.extras.tiles2.naming;
  * @author Daniel Fern&aacute;ndez
  *
  */
-public final class ThymeleafRequestAttributeNaming {
+public class ThymeleafTilesHttpServletResponse extends HttpServletResponseWrapper {
 
-
-    public static final String TEMPLATE_ENGINE = "%%THYMELEAF_TEMPLATE_ENGINE%%";
-    public static final String PROCESSING_CONTEXT = "%%THYMELEAF_PROCESSING_CONTEXT%%";
-    public static final String CONTEXT = "%%THYMELEAF_CONTEXT%%";
-
+    private final PrintWriter printWriter;
     
-    private ThymeleafRequestAttributeNaming() {
-        super();
+    
+    
+    public ThymeleafTilesHttpServletResponse(final HttpServletResponse response, final Writer writer) {
+        super(response);
+        Validate.notNull(writer, "Writer cannot be null");
+        this.printWriter = (writer instanceof PrintWriter? (PrintWriter) writer : new PrintWriter(writer)); 
     }
     
 
+
+    @Override
+    public PrintWriter getWriter() throws IOException {
+        return this.printWriter;
+    }
+
+    
 }

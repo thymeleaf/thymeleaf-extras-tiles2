@@ -24,18 +24,13 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.jsp.PageContext;
 
 import org.apache.tiles.TilesApplicationContext;
-import org.apache.tiles.awareness.TilesRequestContextFactoryAware;
 import org.apache.tiles.context.TilesRequestContext;
 import org.apache.tiles.context.TilesRequestContextFactory;
-import org.apache.tiles.servlet.context.ServletTilesRequestContext;
 import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.IContext;
 import org.thymeleaf.context.IProcessingContext;
-import org.thymeleaf.context.IWebContext;
-import org.thymeleaf.extras.tiles2.naming.ThymeleafRequestAttributeNaming;
-import org.thymeleaf.util.Validate;
 
 
 
@@ -44,13 +39,8 @@ import org.thymeleaf.util.Validate;
  * @author Daniel Fern&aacute;ndez
  *
  */
-public class ThymeleafTilesRequestContextFactory 
-        implements TilesRequestContextFactory, TilesRequestContextFactoryAware {
+public class ThymeleafTilesRequestContextFactory implements TilesRequestContextFactory {
 
-
-    private TilesRequestContextFactory parentContextFactory;
-
-    
     
     
     
@@ -66,71 +56,67 @@ public class ThymeleafTilesRequestContextFactory
         
         // Will require 5 request objects:
         //   1. TemplateEngine
-        //   2. IContext | IProcessingContext
+        //   2. IProcessingContext
         //   3. HttpServletRequest
         //   4. HttpServletResponse
         //   5. Writer
         
         if (requestItems.length == 5 &&
                 requestItems[0] instanceof TemplateEngine &&
-                (requestItems[1] instanceof IContext || requestItems[1] instanceof IProcessingContext) &&
+                requestItems[1] instanceof IProcessingContext &&
                 requestItems[2] instanceof HttpServletRequest &&
                 requestItems[3] instanceof HttpServletResponse &&
                 requestItems[4] instanceof Writer) {
 
+            
             final TemplateEngine templateEngine = (TemplateEngine) requestItems[0];
-            
-            ThymeleafTilesProcessingContext processingContext = null;
-            if (requestItems[1] instanceof IProcessingContext) {
-                if (requestItems[1] instanceof ThymeleafTilesProcessingContext) {
-                    processingContext = (ThymeleafTilesProcessingContext) requestItems[1];
-                } else {
-                    processingContext = new ThymeleafTilesProcessingContext((IProcessingContext) requestItems[1]);
-                }
-            } else if (requestItems[1] instanceof IContext) {
-                Validate.isTrue(requestItems[1] instanceof IWebContext,
-                        "Cannot create " + ThymeleafTilesProcessingContext.class.getSimpleName() + ": " + 
-                        "The specified context does not implement " + IWebContext.class.getName());
-                processingContext = new ThymeleafTilesProcessingContext((IWebContext)requestItems[1]);
-            } else {
-                // Can never happen
-                throw new IllegalArgumentException("Second request item should be IContext or IProcessingContext");
-            }
-            
-            final HttpServletRequest request = (HttpServletRequest) requestItems[2];
-            final HttpServletResponse response = (HttpServletResponse) requestItems[3];
+            final IProcessingContext processingContext = (IProcessingContext) requestItems[1];
+            final HttpServletRequest httpServletRequest = (HttpServletRequest) requestItems[2];
+            final HttpServletResponse httpServletResponse = (HttpServletResponse) requestItems[3];
             final Writer writer = (Writer) requestItems[4];
 
             
-            /*
-             * Refresh the processing context in order to add any new request variables (and link
-             * to a new request/wrapper, if it exists)
-             */
-            processingContext = 
-                    processingContext.refresh(
-                            request, response, processingContext.getContext().getServletContext());
+            final ThymeleafTilesHttpServletRequest request =
+                    computeRequest(httpServletRequest, templateEngine, processingContext);
             
-            /*
-             * Prepare request by adding attributes for template engine and context,
-             * just in case a template of a different kind (e.g. a JSP) tries to execute
-             * a thymeleaf attribute.
-             */
+            final ThymeleafTilesHttpServletResponse response =
+                    computeResponse(httpServletResponse, writer);
             
-            request.setAttribute(ThymeleafRequestAttributeNaming.TEMPLATE_ENGINE, templateEngine);
-            request.setAttribute(ThymeleafRequestAttributeNaming.PROCESSING_CONTEXT, processingContext);
-            request.setAttribute(ThymeleafRequestAttributeNaming.CONTEXT, processingContext.getContext());
-            
-            final TilesRequestContext enclosedRequest =
-                    (this.parentContextFactory != null?
-                            this.parentContextFactory.createRequestContext(tilesApplicationContext, request, response) :
-                            new ServletTilesRequestContext(tilesApplicationContext, request, response));
-            
-            return new ThymeleafTilesRequestContext(enclosedRequest, templateEngine, processingContext, writer);
+            return new ThymeleafTilesRequestContext(tilesApplicationContext, request, response);
+
             
         } else if (requestItems.length == 1 && 
                        requestItems[0] instanceof ThymeleafTilesRequestContext) {
             
+            
             return (ThymeleafTilesRequestContext) requestItems[0];
+            
+            
+        } else if (requestItems.length == 1 && 
+                       requestItems[0] instanceof PageContext) {
+            // Substitution of JspTilesRequestContextFactory
+            
+            final PageContext pageContext = (PageContext) requestItems[0];
+            
+            final ThymeleafTilesHttpServletRequest request =
+                    checkRequest((HttpServletRequest) pageContext.getRequest());
+            final ThymeleafTilesHttpServletResponse response =
+                    checkResponse((HttpServletResponse) pageContext.getResponse());
+            
+            return new ThymeleafTilesRequestContext(tilesApplicationContext, request, response);
+            
+            
+        } else if (requestItems.length == 2 && 
+                       requestItems[0] instanceof HttpServletRequest &&
+                       requestItems[1] instanceof HttpServletResponse) {
+            // Substitution of ServletTilesRequestContextFactory
+            
+            final ThymeleafTilesHttpServletRequest request =
+                    checkRequest((HttpServletRequest) requestItems[0]);
+            final ThymeleafTilesHttpServletResponse response =
+                    checkResponse((HttpServletResponse) requestItems[1]);
+            
+            return new ThymeleafTilesRequestContext(tilesApplicationContext, request, response);
             
         }
         
@@ -139,17 +125,62 @@ public class ThymeleafTilesRequestContextFactory
     }
 
 
+    
+    
+    
+    private static ThymeleafTilesHttpServletRequest computeRequest(
+            final HttpServletRequest request, final TemplateEngine templateEngine, 
+            final IProcessingContext processingContext) {
+        
+        if (request instanceof ThymeleafTilesHttpServletRequest) {
+            return (ThymeleafTilesHttpServletRequest) request;
+        }
+            
+        return new ThymeleafTilesHttpServletRequest(request, templateEngine, processingContext);
+        
+    }
+    
+    
+    
+    private static ThymeleafTilesHttpServletResponse computeResponse(
+            final HttpServletResponse response, final Writer writer) {
+        
+        if (response instanceof ThymeleafTilesHttpServletResponse) {
+            return (ThymeleafTilesHttpServletResponse) response;
+        }
+        
+        return new ThymeleafTilesHttpServletResponse(response, writer);
+        
+    }
+    
+    
+    
+    
+    private static ThymeleafTilesHttpServletRequest checkRequest(final HttpServletRequest request) {
+        if (request instanceof ThymeleafTilesHttpServletRequest) {
+            return (ThymeleafTilesHttpServletRequest) request;
+        }
+        throw new IllegalArgumentException("Request is not a " + ThymeleafTilesHttpServletRequest.class.getName());
+    }
+    
+    
 
+    private static ThymeleafTilesHttpServletResponse checkResponse(final HttpServletResponse response) {
+        if (response instanceof ThymeleafTilesHttpServletResponse) {
+            return (ThymeleafTilesHttpServletResponse) response;
+        }
+        throw new IllegalArgumentException("Response is not a " + ThymeleafTilesHttpServletResponse.class.getName());
+    }
+    
+    
+
+    
+    
     @Deprecated
     public void init(final Map<String, String> configurationParameters) {
         // Nothing to do here.
     }
 
-
-
-    public void setRequestContextFactory(final TilesRequestContextFactory parentContextFactory) {
-        this.parentContextFactory = parentContextFactory;
-    }
 
 
 }

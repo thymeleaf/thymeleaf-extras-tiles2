@@ -34,7 +34,9 @@ import org.springframework.web.servlet.support.JstlUtils;
 import org.springframework.web.servlet.support.RequestContext;
 import org.springframework.web.servlet.view.AbstractTemplateView;
 import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.IProcessingContext;
 import org.thymeleaf.context.IWebContext;
+import org.thymeleaf.context.ProcessingContext;
 import org.thymeleaf.extras.tiles2.spring.web.configurer.ThymeleafTilesConfigurer;
 import org.thymeleaf.spring3.SpringTemplateEngine;
 import org.thymeleaf.spring3.context.SpringWebContext;
@@ -98,6 +100,7 @@ public class ThymeleafTilesView extends ThymeleafView {
         
         final IWebContext context = 
                 new SpringWebContext(request, response, servletContext , getLocale(), mergedModel, getApplicationContext());
+        final IProcessingContext processingContext = new ProcessingContext(context);
         
         final TemplateEngine viewTemplateEngine = getTemplateEngine();
         
@@ -128,7 +131,7 @@ public class ThymeleafTilesView extends ThymeleafView {
         JstlUtils.exposeLocalizationContext(requestContext);
         
         
-        container.render(getTemplateName(), viewTemplateEngine, context, request, response, response.getWriter());
+        container.render(getTemplateName(), viewTemplateEngine, processingContext, request, response, response.getWriter());
         
     }
 

@@ -19,6 +19,7 @@
  */
 package org.thymeleaf.extras.tiles2.factory;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.tiles.TilesApplicationContext;
@@ -32,8 +33,8 @@ import org.apache.tiles.renderer.TypeDetectingAttributeRenderer;
 import org.apache.tiles.renderer.impl.BasicRendererFactory;
 import org.apache.tiles.renderer.impl.ChainedDelegateAttributeRenderer;
 import org.thymeleaf.extras.tiles2.context.ThymeleafTilesRequestContextFactory;
-import org.thymeleaf.extras.tiles2.renderer.LocalVariableTemplateAttributeRenderer;
 import org.thymeleaf.extras.tiles2.renderer.ThymeleafAttributeRenderer;
+import org.thymeleaf.extras.tiles2.renderer.ThymeleafJspAttributeRenderer;
 
 
 
@@ -101,7 +102,7 @@ public class ThymeleafTilesContainerFactory
             final TilesContainer container,
             final AttributeEvaluatorFactory attributeEvaluatorFactory) {
         
-        final LocalVariableTemplateAttributeRenderer templateRenderer = new LocalVariableTemplateAttributeRenderer();
+        final ThymeleafJspAttributeRenderer templateRenderer = new ThymeleafJspAttributeRenderer();
         templateRenderer.setApplicationContext(applicationContext);
         templateRenderer.setRequestContextFactory(contextFactory);
         templateRenderer.setAttributeEvaluatorFactory(attributeEvaluatorFactory);
@@ -167,7 +168,7 @@ public class ThymeleafTilesContainerFactory
     protected List<TilesRequestContextFactory> getTilesRequestContextFactoriesToBeChained(
             final ChainedTilesRequestContextFactory parent) {
 
-        final List<TilesRequestContextFactory> factories = super.getTilesRequestContextFactoriesToBeChained(parent);
+        final List<TilesRequestContextFactory> factories = new ArrayList<TilesRequestContextFactory>();
         registerRequestContextFactory(
                 ThymeleafTilesRequestContextFactory.class.getName(),
                 factories, parent);

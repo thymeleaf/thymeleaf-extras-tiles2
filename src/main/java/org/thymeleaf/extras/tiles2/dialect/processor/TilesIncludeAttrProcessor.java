@@ -37,12 +37,12 @@ import org.thymeleaf.Arguments;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.IContext;
 import org.thymeleaf.context.IWebContext;
+import org.thymeleaf.context.ProcessingContext;
 import org.thymeleaf.dom.Element;
 import org.thymeleaf.dom.Macro;
 import org.thymeleaf.dom.Node;
 import org.thymeleaf.exceptions.ConfigurationException;
 import org.thymeleaf.exceptions.TemplateProcessingException;
-import org.thymeleaf.extras.tiles2.context.ThymeleafTilesProcessingContext;
 import org.thymeleaf.processor.attr.AbstractChildrenModifierAttrProcessor;
 
 
@@ -97,7 +97,7 @@ public class TilesIncludeAttrProcessor
         }
         final IWebContext webContext = (IWebContext) context;
         
-        final ThymeleafTilesProcessingContext processingContext = new ThymeleafTilesProcessingContext(arguments);
+        final ProcessingContext processingContext = new ProcessingContext(arguments);
         
         final HttpServletRequest request = webContext.getHttpServletRequest();
         final HttpServletResponse response = webContext.getHttpServletResponse();
