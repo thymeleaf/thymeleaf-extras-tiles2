@@ -19,18 +19,22 @@
  */
 package org.thymeleaf.extras.tiles2.context;
 
+import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.jsp.PageContext;
 
 import org.apache.tiles.TilesApplicationContext;
+import org.apache.tiles.awareness.TilesRequestContextFactoryAware;
 import org.apache.tiles.context.TilesRequestContext;
 import org.apache.tiles.context.TilesRequestContextFactory;
+import org.apache.tiles.servlet.context.ExternalWriterHttpServletResponse;
+import org.apache.tiles.servlet.context.ServletTilesRequestContext;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.IProcessingContext;
+import org.thymeleaf.extras.tiles2.naming.ThymeleafTilesNaming;
 
 
 
@@ -39,8 +43,12 @@ import org.thymeleaf.context.IProcessingContext;
  * @author Daniel Fern&aacute;ndez
  *
  */
-public class ThymeleafTilesRequestContextFactory implements TilesRequestContextFactory {
+public class ThymeleafTilesRequestContextFactory 
+        implements TilesRequestContextFactory, TilesRequestContextFactoryAware {
 
+    
+    
+    private TilesRequestContextFactory parent = null;
     
     
     
@@ -71,52 +79,36 @@ public class ThymeleafTilesRequestContextFactory implements TilesRequestContextF
             
             final TemplateEngine templateEngine = (TemplateEngine) requestItems[0];
             final IProcessingContext processingContext = (IProcessingContext) requestItems[1];
-            final HttpServletRequest httpServletRequest = (HttpServletRequest) requestItems[2];
-            final HttpServletResponse httpServletResponse = (HttpServletResponse) requestItems[3];
+            final HttpServletRequest request = (HttpServletRequest) requestItems[2];
+            final HttpServletResponse response = (HttpServletResponse) requestItems[3];
             final Writer writer = (Writer) requestItems[4];
+            
+            
+            /*
+             * Add TemplateEngine, ProcessingContext and Writer as attributes to the request,
+             * in case we have an scenario where a JSP calls another JSP which then calls a Thymeleaf
+             * template (JSPs use PageContext, which references the original request and response objects).
+             */
+            
+            request.setAttribute(ThymeleafTilesNaming.TEMPLATE_ENGINE_ATTRIBUTE_NAME, templateEngine);
+            request.setAttribute(ThymeleafTilesNaming.PROCESSING_CONTEXT_ATTRIBUTE_NAME, processingContext);
 
             
-            final ThymeleafTilesHttpServletRequest request =
-                    computeRequest(httpServletRequest, templateEngine, processingContext);
-            
-            final ThymeleafTilesHttpServletResponse response =
-                    computeResponse(httpServletResponse, writer);
-            
-            return new ThymeleafTilesRequestContext(tilesApplicationContext, request, response);
+            /*
+             * We add our own writer to the response
+             */
+            final HttpServletResponse responseWithWriter = 
+                    new ExternalWriterHttpServletResponse(
+                            response, 
+                            (writer instanceof PrintWriter? (PrintWriter)writer : new PrintWriter(writer)));
 
-            
-        } else if (requestItems.length == 1 && 
-                       requestItems[0] instanceof ThymeleafTilesRequestContext) {
-            
-            
-            return (ThymeleafTilesRequestContext) requestItems[0];
-            
-            
-        } else if (requestItems.length == 1 && 
-                       requestItems[0] instanceof PageContext) {
-            // Substitution of JspTilesRequestContextFactory
-            
-            final PageContext pageContext = (PageContext) requestItems[0];
-            
-            final ThymeleafTilesHttpServletRequest request =
-                    checkRequest((HttpServletRequest) pageContext.getRequest());
-            final ThymeleafTilesHttpServletResponse response =
-                    checkResponse((HttpServletResponse) pageContext.getResponse());
-            
-            return new ThymeleafTilesRequestContext(tilesApplicationContext, request, response);
-            
-            
-        } else if (requestItems.length == 2 && 
-                       requestItems[0] instanceof HttpServletRequest &&
-                       requestItems[1] instanceof HttpServletResponse) {
-            // Substitution of ServletTilesRequestContextFactory
-            
-            final ThymeleafTilesHttpServletRequest request =
-                    checkRequest((HttpServletRequest) requestItems[0]);
-            final ThymeleafTilesHttpServletResponse response =
-                    checkResponse((HttpServletResponse) requestItems[1]);
-            
-            return new ThymeleafTilesRequestContext(tilesApplicationContext, request, response);
+            /*
+             * Delegate de creation of the request context, if possible (normally, a ServletTilesRequestContext will be created anyway)
+             */
+            if (this.parent != null) {
+                return this.parent.createRequestContext(tilesApplicationContext, request, responseWithWriter);
+            }
+            return new ServletTilesRequestContext(tilesApplicationContext, request, responseWithWriter);
             
         }
         
@@ -126,59 +118,21 @@ public class ThymeleafTilesRequestContextFactory implements TilesRequestContextF
 
 
     
-    
-    
-    private static ThymeleafTilesHttpServletRequest computeRequest(
-            final HttpServletRequest request, final TemplateEngine templateEngine, 
-            final IProcessingContext processingContext) {
-        
-        if (request instanceof ThymeleafTilesHttpServletRequest) {
-            return (ThymeleafTilesHttpServletRequest) request;
-        }
-            
-        return new ThymeleafTilesHttpServletRequest(request, templateEngine, processingContext);
-        
-    }
-    
-    
-    
-    private static ThymeleafTilesHttpServletResponse computeResponse(
-            final HttpServletResponse response, final Writer writer) {
-        
-        if (response instanceof ThymeleafTilesHttpServletResponse) {
-            return (ThymeleafTilesHttpServletResponse) response;
-        }
-        
-        return new ThymeleafTilesHttpServletResponse(response, writer);
-        
-    }
-    
-    
-    
-    
-    private static ThymeleafTilesHttpServletRequest checkRequest(final HttpServletRequest request) {
-        if (request instanceof ThymeleafTilesHttpServletRequest) {
-            return (ThymeleafTilesHttpServletRequest) request;
-        }
-        throw new IllegalArgumentException("Request is not a " + ThymeleafTilesHttpServletRequest.class.getName());
-    }
-    
-    
-
-    private static ThymeleafTilesHttpServletResponse checkResponse(final HttpServletResponse response) {
-        if (response instanceof ThymeleafTilesHttpServletResponse) {
-            return (ThymeleafTilesHttpServletResponse) response;
-        }
-        throw new IllegalArgumentException("Response is not a " + ThymeleafTilesHttpServletResponse.class.getName());
-    }
-    
-    
 
     
     
     @Deprecated
     public void init(final Map<String, String> configurationParameters) {
         // Nothing to do here.
+    }
+
+
+    
+    
+
+
+    public void setRequestContextFactory(final TilesRequestContextFactory contextFactory) {
+        this.parent = contextFactory;
     }
 
 

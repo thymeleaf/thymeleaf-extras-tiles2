@@ -20,21 +20,27 @@
 package org.thymeleaf.extras.tiles2.renderer;
 
 import java.io.IOException;
-import java.io.Writer;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.jsp.PageContext;
 
 import org.apache.tiles.Attribute;
 import org.apache.tiles.context.TilesRequestContext;
 import org.apache.tiles.impl.InvalidTemplateException;
+import org.apache.tiles.jsp.context.JspTilesRequestContext;
 import org.apache.tiles.renderer.impl.AbstractTypeDetectingAttributeRenderer;
+import org.apache.tiles.servlet.context.ServletTilesRequestContext;
+import org.apache.tiles.servlet.context.ServletUtil;
 import org.thymeleaf.Configuration;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.IProcessingContext;
 import org.thymeleaf.dialect.IDialect;
 import org.thymeleaf.exceptions.ConfigurationException;
-import org.thymeleaf.extras.tiles2.context.ThymeleafTilesRequestContext;
 import org.thymeleaf.extras.tiles2.dialect.TilesDialect;
 import org.thymeleaf.extras.tiles2.dialect.processor.TilesFragmentAttrProcessor;
+import org.thymeleaf.extras.tiles2.naming.ThymeleafTilesNaming;
 import org.thymeleaf.fragment.DOMSelectorFragmentSpec;
 import org.thymeleaf.fragment.ElementAndAttributeNameFragmentSpec;
 import org.thymeleaf.fragment.FragmentAndTarget;
@@ -55,7 +61,8 @@ public class ThymeleafAttributeRenderer
 
     
     
-    private static final String SPRING_STANDARD_DIALECT_CLASS_NAME = "org.thymeleaf.spring3.dialect.SpringStandardDialect";
+    private static final String SPRING_STANDARD_DIALECT_CLASS_NAME = 
+            "org.thymeleaf.spring3.dialect.SpringStandardDialect";
 
     
     
@@ -79,22 +86,37 @@ public class ThymeleafAttributeRenderer
                     "Cannot render a template that is not a String ('" + value.getClass().getName() +"')");
         }
 
-        final ThymeleafTilesRequestContext requestContext = 
-                (ThymeleafTilesRequestContext) tilesRequestContext;
+        
+        if (tilesRequestContext instanceof JspTilesRequestContext) {
+            // If our Thymeleaf template is being executed from a JSP, we should
+            // first flush the associated JspWriter (because it will be buffering
+            // instead of directly writing to the response.getWriter() we will be writing.
+            final JspTilesRequestContext jspTilesRequestContext = (JspTilesRequestContext) tilesRequestContext;
+            final PageContext pageContext = jspTilesRequestContext.getPageContext();
+            pageContext.getOut().flush();
+        }
+        
+        
+        final ServletTilesRequestContext requestContext = 
+                ServletUtil.getServletRequest(tilesRequestContext);
         
         final String templateSelector = (String) value;
-        
-        final TemplateEngine templateEngine = requestContext.getTemplateEngine();
-        final IProcessingContext processingContext = requestContext.getProcessingContext();
-        final Writer writer = requestContext.getWriter();
 
+        final HttpServletRequest request = requestContext.getRequest();
+        final HttpServletResponse response = requestContext.getResponse();
+System.out.println("\n**>RESPONSE IN THYMELEAF ATTR_RENDERER FOR " + templateSelector +" IS: " + response.getClass().getName() +"\n");        
+        final TemplateEngine templateEngine = 
+                (TemplateEngine) request.getAttribute(ThymeleafTilesNaming.TEMPLATE_ENGINE_ATTRIBUTE_NAME);
+        final IProcessingContext processingContext = 
+                (IProcessingContext) request.getAttribute(ThymeleafTilesNaming.PROCESSING_CONTEXT_ATTRIBUTE_NAME);
+        
         final FragmentAndTarget fragmentAndTarget = 
                 computeTemplateSelector(templateEngine, processingContext, templateSelector);
 
         final String templateName = fragmentAndTarget.getTemplateName();
         final IFragmentSpec fragmentSpec = fragmentAndTarget.getFragmentSpec();
 
-        templateEngine.process(templateName, processingContext, fragmentSpec, writer);
+        templateEngine.process(templateName, processingContext, fragmentSpec, response.getWriter());
         
     }
     

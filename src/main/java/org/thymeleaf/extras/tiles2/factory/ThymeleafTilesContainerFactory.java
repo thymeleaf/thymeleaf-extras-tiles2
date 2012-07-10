@@ -19,7 +19,6 @@
  */
 package org.thymeleaf.extras.tiles2.factory;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.tiles.TilesApplicationContext;
@@ -34,7 +33,6 @@ import org.apache.tiles.renderer.impl.BasicRendererFactory;
 import org.apache.tiles.renderer.impl.ChainedDelegateAttributeRenderer;
 import org.thymeleaf.extras.tiles2.context.ThymeleafTilesRequestContextFactory;
 import org.thymeleaf.extras.tiles2.renderer.ThymeleafAttributeRenderer;
-import org.thymeleaf.extras.tiles2.renderer.ThymeleafJspAttributeRenderer;
 
 
 
@@ -43,12 +41,13 @@ import org.thymeleaf.extras.tiles2.renderer.ThymeleafJspAttributeRenderer;
  * @author Daniel Fern&aacute;ndez
  *
  */
-public class ThymeleafTilesContainerFactory 
-        extends BasicTilesContainerFactory {
+public class ThymeleafTilesContainerFactory extends BasicTilesContainerFactory {
 
     
     public static final String THYMELEAF_RENDERER_NAME = "thymeleaf";
     public static final String JSP_RENDERER_NAME = "jsp";
+
+    
     
     
     public ThymeleafTilesContainerFactory() {
@@ -66,22 +65,22 @@ public class ThymeleafTilesContainerFactory
             final TilesContainer container,
             final AttributeEvaluatorFactory attributeEvaluatorFactory) {
 
-        
-        rendererFactory.registerRenderer(STRING_RENDERER_NAME,
-                createStringAttributeRenderer(rendererFactory,
-                        applicationContext, contextFactory, container,
-                        attributeEvaluatorFactory));
-        
-        rendererFactory.registerRenderer(JSP_RENDERER_NAME,
-                createJspAttributeRenderer(rendererFactory,
-                        applicationContext, contextFactory, container,
-                        attributeEvaluatorFactory));
-        
-        rendererFactory.registerRenderer(DEFINITION_RENDERER_NAME,
-                createDefinitionAttributeRenderer(rendererFactory,
-                        applicationContext, contextFactory, container,
-                        attributeEvaluatorFactory));
+        super.registerAttributeRenderers(
+                rendererFactory, applicationContext, contextFactory, 
+                container, attributeEvaluatorFactory);
 
+        /*
+         * Move the JSP renderer from "template" to type="jsp"
+         */
+        rendererFactory.registerRenderer(
+                JSP_RENDERER_NAME, 
+                rendererFactory.getRenderer(TEMPLATE_RENDERER_NAME));
+        
+        
+        /*
+         * Create the Thymeleaf renderer and register it both as type="thymeleaf"
+         * and as general template renderer (no 'type' attribute specified)
+         */
         final AttributeRenderer thymeleafAttributeRenderer = 
                 createThymeleafAttributeRenderer(rendererFactory,
                         applicationContext, contextFactory, container,
@@ -92,24 +91,6 @@ public class ThymeleafTilesContainerFactory
         
     }
 
-
-
-    @SuppressWarnings("unused")
-    protected AttributeRenderer createJspAttributeRenderer(
-            final BasicRendererFactory rendererFactory,
-            final TilesApplicationContext applicationContext,
-            final TilesRequestContextFactory contextFactory,
-            final TilesContainer container,
-            final AttributeEvaluatorFactory attributeEvaluatorFactory) {
-        
-        final ThymeleafJspAttributeRenderer templateRenderer = new ThymeleafJspAttributeRenderer();
-        templateRenderer.setApplicationContext(applicationContext);
-        templateRenderer.setRequestContextFactory(contextFactory);
-        templateRenderer.setAttributeEvaluatorFactory(attributeEvaluatorFactory);
-        
-        return templateRenderer;
-        
-    }
 
 
 
@@ -168,7 +149,7 @@ public class ThymeleafTilesContainerFactory
     protected List<TilesRequestContextFactory> getTilesRequestContextFactoriesToBeChained(
             final ChainedTilesRequestContextFactory parent) {
 
-        final List<TilesRequestContextFactory> factories = new ArrayList<TilesRequestContextFactory>();
+        final List<TilesRequestContextFactory> factories = super.getTilesRequestContextFactoriesToBeChained(parent);
         registerRequestContextFactory(
                 ThymeleafTilesRequestContextFactory.class.getName(),
                 factories, parent);
