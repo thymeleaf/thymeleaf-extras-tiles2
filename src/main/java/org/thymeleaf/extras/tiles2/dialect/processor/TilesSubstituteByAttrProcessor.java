@@ -19,31 +19,8 @@
  */
 package org.thymeleaf.extras.tiles2.dialect.processor;
 
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.Collections;
-import java.util.List;
-
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.tiles.Attribute;
-import org.apache.tiles.TilesContainer;
-import org.apache.tiles.servlet.context.ServletUtil;
-import org.apache.tiles.template.DefaultAttributeResolver;
-import org.apache.tiles.template.InsertAttributeModel;
 import org.thymeleaf.Arguments;
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.IContext;
-import org.thymeleaf.context.IWebContext;
-import org.thymeleaf.context.ProcessingContext;
 import org.thymeleaf.dom.Element;
-import org.thymeleaf.dom.Macro;
-import org.thymeleaf.dom.Node;
-import org.thymeleaf.exceptions.ConfigurationException;
-import org.thymeleaf.exceptions.TemplateProcessingException;
-import org.thymeleaf.processor.attr.AbstractChildrenModifierAttrProcessor;
 
 
 
@@ -53,17 +30,11 @@ import org.thymeleaf.processor.attr.AbstractChildrenModifierAttrProcessor;
  *
  */
 public class TilesSubstituteByAttrProcessor
-        extends AbstractChildrenModifierAttrProcessor {
+        extends AbstractTilesFragmentHandlingAttrProcessor {
     
 
     public static final String ATTR_NAME = "substituteby";
     public static final int PRECEDENCE = 100;
-    
-    
-    // Initialized in the same way it is done in InsertAttributeTag (JSP) and
-    // InsertAttributeDirective (Velocity)
-    private final InsertAttributeModel model = 
-            new InsertAttributeModel(new DefaultAttributeResolver());
     
     
     
@@ -80,63 +51,6 @@ public class TilesSubstituteByAttrProcessor
     }
 
     
-    
-
-    @Override
-    protected List<Node> getModifiedChildren(final Arguments arguments,
-            final Element element, String attributeName) {
-
-        final String attributeValue = element.getAttributeValue(attributeName);
-        
-        final IContext context = arguments.getContext();
-        if (!(context instanceof IWebContext)) {
-            throw new ConfigurationException(
-                    "Thymeleaf execution context is not a web context (implementation of " +
-                    IWebContext.class.getName() + ". Tiles integration can only be used in " +
-            		"web environements.");
-        }
-        final IWebContext webContext = (IWebContext) context;
-        
-        final ProcessingContext processingContext = new ProcessingContext(arguments);
-        
-        final HttpServletRequest request = webContext.getHttpServletRequest();
-        final HttpServletResponse response = webContext.getHttpServletResponse();
-        final ServletContext servletContext = request.getSession().getServletContext();
-        
-        final TilesContainer tilesContainer = ServletUtil.getContainer(servletContext);
-
-        final boolean ignore = false;
-        final String preparer = null;
-        final String role = null;
-        final Object defaultValue = null;
-        final String defaultValueRole = null;
-        final String defaultValueType = null;
-        final String name = attributeValue;
-        final Attribute value = null;
-        
-        final TemplateEngine templateEngine = TemplateEngine.threadTemplateEngine();
-        final StringWriter writer = new StringWriter();
-        
-        try {
-            this.model.execute(
-                    tilesContainer, ignore, preparer, 
-                    role, defaultValue, defaultValueRole, 
-                    defaultValueType, name, value,
-                    templateEngine, processingContext,
-                    request, response, writer);
-        } catch (final IOException e)  {
-            throw new TemplateProcessingException(
-                    "Error while processing Tiles attribute \"" + name + "\"", e);
-        }
-        
-        final String templateResult = writer.toString();
-        
-        final Macro macroNode = new Macro(templateResult);
-        
-        return Collections.singletonList((Node)macroNode);
-        
-    }
-
 
 
 

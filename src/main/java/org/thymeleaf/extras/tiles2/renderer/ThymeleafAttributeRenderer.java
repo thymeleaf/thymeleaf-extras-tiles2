@@ -104,7 +104,7 @@ public class ThymeleafAttributeRenderer
 
         final HttpServletRequest request = requestContext.getRequest();
         final HttpServletResponse response = requestContext.getResponse();
-System.out.println("\n**>RESPONSE IN THYMELEAF ATTR_RENDERER FOR " + templateSelector +" IS: " + response.getClass().getName() +"\n");        
+
         final TemplateEngine templateEngine = 
                 (TemplateEngine) request.getAttribute(ThymeleafTilesNaming.TEMPLATE_ENGINE_ATTRIBUTE_NAME);
         final IProcessingContext processingContext = 
