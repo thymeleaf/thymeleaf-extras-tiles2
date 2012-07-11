@@ -33,7 +33,9 @@ import org.apache.tiles.context.TilesRequestContextFactory;
 import org.apache.tiles.servlet.context.ExternalWriterHttpServletResponse;
 import org.apache.tiles.servlet.context.ServletTilesRequestContext;
 import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.IContext;
 import org.thymeleaf.context.IProcessingContext;
+import org.thymeleaf.context.ProcessingContext;
 import org.thymeleaf.extras.tiles2.naming.ThymeleafTilesNaming;
 
 
@@ -71,18 +73,21 @@ public class ThymeleafTilesRequestContextFactory
         
         if (requestItems.length == 5 &&
                 requestItems[0] instanceof TemplateEngine &&
-                requestItems[1] instanceof IProcessingContext &&
+                (requestItems[1] instanceof IProcessingContext || requestItems[1] instanceof IContext) &&
                 requestItems[2] instanceof HttpServletRequest &&
                 requestItems[3] instanceof HttpServletResponse &&
                 requestItems[4] instanceof Writer) {
 
             
             final TemplateEngine templateEngine = (TemplateEngine) requestItems[0];
-            final IProcessingContext processingContext = (IProcessingContext) requestItems[1];
+            final Object contextObject = requestItems[1];
             final HttpServletRequest request = (HttpServletRequest) requestItems[2];
             final HttpServletResponse response = (HttpServletResponse) requestItems[3];
             final Writer writer = (Writer) requestItems[4];
             
+            final IProcessingContext processingContext =
+                    (contextObject instanceof IProcessingContext?
+                            (IProcessingContext)contextObject : new ProcessingContext((IContext)contextObject));
             
             /*
              * Add TemplateEngine, ProcessingContext and Writer as attributes to the request,

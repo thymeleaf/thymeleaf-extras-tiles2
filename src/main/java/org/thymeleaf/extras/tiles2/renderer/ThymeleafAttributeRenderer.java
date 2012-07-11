@@ -33,6 +33,8 @@ import org.apache.tiles.jsp.context.JspTilesRequestContext;
 import org.apache.tiles.renderer.impl.AbstractTypeDetectingAttributeRenderer;
 import org.apache.tiles.servlet.context.ServletTilesRequestContext;
 import org.apache.tiles.servlet.context.ServletUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.thymeleaf.Configuration;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.IProcessingContext;
@@ -58,6 +60,9 @@ import org.thymeleaf.standard.fragment.StandardFragmentProcessor;
  */
 public class ThymeleafAttributeRenderer 
         extends AbstractTypeDetectingAttributeRenderer {
+
+    
+    private static final Logger logger = LoggerFactory.getLogger(ThymeleafAttributeRenderer.class);
 
     
     
@@ -86,14 +91,9 @@ public class ThymeleafAttributeRenderer
                     "Cannot render a template that is not a String ('" + value.getClass().getName() +"')");
         }
 
-        
-        if (tilesRequestContext instanceof JspTilesRequestContext) {
-            // If our Thymeleaf template is being executed from a JSP, we should
-            // first flush the associated JspWriter (because it will be buffering
-            // instead of directly writing to the response.getWriter() we will be writing.
-            final JspTilesRequestContext jspTilesRequestContext = (JspTilesRequestContext) tilesRequestContext;
-            final PageContext pageContext = jspTilesRequestContext.getPageContext();
-            pageContext.getOut().flush();
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("[THYMELEAF][{}] Rendering Thymeleaf Tiles attribute \"{}\"", new Object[] {TemplateEngine.threadIndex(), value});
         }
         
         
@@ -109,6 +109,26 @@ public class ThymeleafAttributeRenderer
                 (TemplateEngine) request.getAttribute(ThymeleafTilesNaming.TEMPLATE_ENGINE_ATTRIBUTE_NAME);
         final IProcessingContext processingContext = 
                 (IProcessingContext) request.getAttribute(ThymeleafTilesNaming.PROCESSING_CONTEXT_ATTRIBUTE_NAME);
+
+        
+        if (tilesRequestContext instanceof JspTilesRequestContext) {
+
+            if (logger.isTraceEnabled()) {
+                logger.trace("[THYMELEAF][{}] Current Tiles Request Context is a JSP" +
+                		"context. Flushing JspWriter to avoid fragment writing order " +
+                		"problems.", 
+                        new Object[] {TemplateEngine.threadIndex()});
+            }
+            
+            // If our Thymeleaf template is being executed from a JSP, we should
+            // first flush the associated JspWriter (because it will be buffering
+            // instead of directly writing to the response.getWriter() we will be writing.
+            final JspTilesRequestContext jspTilesRequestContext = (JspTilesRequestContext) tilesRequestContext;
+            final PageContext pageContext = jspTilesRequestContext.getPageContext();
+            pageContext.getOut().flush();
+            
+        }
+        
         
         final FragmentAndTarget fragmentAndTarget = 
                 computeTemplateSelector(templateEngine, processingContext, templateSelector);
@@ -116,7 +136,14 @@ public class ThymeleafAttributeRenderer
         final String templateName = fragmentAndTarget.getTemplateName();
         final IFragmentSpec fragmentSpec = fragmentAndTarget.getFragmentSpec();
 
+        
         templateEngine.process(templateName, processingContext, fragmentSpec, response.getWriter());
+
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("[THYMELEAF][{}] Rendered Thymeleaf Tiles attribute \"{}\"", new Object[] {TemplateEngine.threadIndex(), value});
+        }
+        
         
     }
     
