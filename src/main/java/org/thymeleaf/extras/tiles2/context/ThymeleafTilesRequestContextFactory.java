@@ -32,6 +32,8 @@ import org.apache.tiles.context.TilesRequestContext;
 import org.apache.tiles.context.TilesRequestContextFactory;
 import org.apache.tiles.servlet.context.ExternalWriterHttpServletResponse;
 import org.apache.tiles.servlet.context.ServletTilesRequestContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.IContext;
 import org.thymeleaf.context.IProcessingContext;
@@ -48,6 +50,8 @@ import org.thymeleaf.extras.tiles2.naming.ThymeleafTilesNaming;
 public class ThymeleafTilesRequestContextFactory 
         implements TilesRequestContextFactory, TilesRequestContextFactoryAware {
 
+    
+    private static final Logger logger = LoggerFactory.getLogger(ThymeleafTilesRequestContextFactory.class);
     
     
     private TilesRequestContextFactory parent = null;
@@ -78,6 +82,7 @@ public class ThymeleafTilesRequestContextFactory
                 requestItems[3] instanceof HttpServletResponse &&
                 requestItems[4] instanceof Writer) {
 
+            
             
             final TemplateEngine templateEngine = (TemplateEngine) requestItems[0];
             final Object contextObject = requestItems[1];
@@ -110,10 +115,17 @@ public class ThymeleafTilesRequestContextFactory
             /*
              * Delegate de creation of the request context, if possible (normally, a ServletTilesRequestContext will be created anyway)
              */
-            if (this.parent != null) {
-                return this.parent.createRequestContext(tilesApplicationContext, request, responseWithWriter);
+            final TilesRequestContext result =
+                    (this.parent != null?
+                            this.parent.createRequestContext(tilesApplicationContext, request, responseWithWriter) :
+                            new ServletTilesRequestContext(tilesApplicationContext, request, responseWithWriter));
+
+            if (logger.isTraceEnabled()) {
+                logger.trace("[THYMELEAF][{}] Processed Thymeleaf Tiles Request Context. " +
+                        "Created instance of {}", new Object[] {TemplateEngine.threadIndex(), (result != null? result.getClass().getName() : null)});
             }
-            return new ServletTilesRequestContext(tilesApplicationContext, request, responseWithWriter);
+            
+            return result;
             
         }
         

@@ -46,6 +46,7 @@ public class ThymeleafTilesInitializer
     protected AbstractTilesContainerFactory createContainerFactory(
             final TilesApplicationContext context) {
         return new ThymeleafTilesContainerFactory();
+        
     }
 
     

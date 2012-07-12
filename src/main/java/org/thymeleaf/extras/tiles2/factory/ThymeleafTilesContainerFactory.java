@@ -31,6 +31,8 @@ import org.apache.tiles.renderer.AttributeRenderer;
 import org.apache.tiles.renderer.TypeDetectingAttributeRenderer;
 import org.apache.tiles.renderer.impl.BasicRendererFactory;
 import org.apache.tiles.renderer.impl.ChainedDelegateAttributeRenderer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.thymeleaf.extras.tiles2.context.ThymeleafTilesRequestContextFactory;
 import org.thymeleaf.extras.tiles2.renderer.ThymeleafAttributeRenderer;
 
@@ -44,6 +46,9 @@ import org.thymeleaf.extras.tiles2.renderer.ThymeleafAttributeRenderer;
 public class ThymeleafTilesContainerFactory extends BasicTilesContainerFactory {
 
     
+    private static final Logger logger = LoggerFactory.getLogger(ThymeleafTilesContainerFactory.class);
+
+    
     public static final String THYMELEAF_RENDERER_NAME = "thymeleaf";
     public static final String JSP_RENDERER_NAME = "jsp";
 
@@ -51,7 +56,14 @@ public class ThymeleafTilesContainerFactory extends BasicTilesContainerFactory {
     
     
     public ThymeleafTilesContainerFactory() {
+        
         super();
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("[THYMELEAF] INITIALIZING TILES CONTAINER FACTORY FOR THYMELEAF. " +
+            		"AVAILABLE TEMPLATE TYPES ARE: \"thymeleaf\" (default), \"jsp\" AND \"string\"");
+        }
+        
     }
 
 
