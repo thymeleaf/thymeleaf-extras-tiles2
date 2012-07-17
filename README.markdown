@@ -78,6 +78,7 @@ Spring + Thymeleaf applications (*TemplateEngine* bean, *template resolvers*,
 etc.), and then create an instance of the `ThymeleafTilesConfigurer` (similar
 to the Spring Tiles configurer for JSP), like:
 
+```java
     <bean id="tilesConfigurer" class="org.thymeleaf.extras.tiles2.spring.web.configurer.ThymeleafTilesConfigurer">
       <property name="definitions">
         <list>
@@ -85,6 +86,7 @@ to the Spring Tiles configurer for JSP), like:
         </list>
       </property>
     </bean>
+```
 
 Also, you will need to configure your Thymeleaf *view resolver* in order to
 use a specialized Thymeleaf-Tiles2 view class:
