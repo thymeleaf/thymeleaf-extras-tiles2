@@ -4,12 +4,28 @@ Thymeleaf - Tiles 2 integration module
 
 ------------------------------------------------------------------------------
 
+Status
+------
+
+This is a *thymeleaf extras* module, not a part of the Thymeleaf core (and as
+such following its own versioning schema), but fully supported by the 
+Thymeleaf team.
+
+
+License
+-------
+
+This software module is licensed under the [Apache License 2.0]
+(http://www.apache.org/licenses/LICENSE-2.0.html).
+
+
 Requirements
 ------------
 
   *   Thymeleaf **2.0.10**
   *   Apache Tiles 2 version **2.2.1+** (**2.2.2** recommended)
   *   Web environment (Tiles integration cannot work offline)
+
 
 Features
 --------
@@ -89,24 +105,30 @@ definition names as view names and everything should work fine.
 Configuration and usage without Spring
 --------------------------------------
 
-Following the standard configuration mechanisms in Tiles 2.2, in order to use Thymeleaf + Tiles in
-a non-Spring application, you should:
+Following the standard configuration mechanisms in Tiles 2.2, in order to 
+use Thymeleaf + Tiles in a non-Spring application, you should:
 
-  *   Either configure an `org.thymeleaf.extras.tiles2.web.startup.ThymeleafTilesListener` at your `web.xml`
-  *   ...or configure an `org.thymeleaf.extras.tiles2.web.startup.ThymeleafTilesServlet`, also at your `web.xml`.
+  *   Either configure an `org.thymeleaf.extras.tiles2.web.startup.ThymeleafTilesListener`
+      at your `web.xml`
+  *   ...or configure an `org.thymeleaf.extras.tiles2.web.startup.ThymeleafTilesServlet`,
+      also at your `web.xml`.
 
-Both of these artifacts declare an initialize a Thymeleaf-enabled `TilesContainer` instance, which you can
-access with:
+Both of these artifacts declare and initialize a Thymeleaf-enabled 
+`TilesContainer` instance, which you can access with:
 
     final TilesContainer tiles = ServletUtil.getContainer(servletContext);
     
-...and then execute specifying the definition to be executed and the following sequence of *request items*:
+...and then execute specifying the definition to be executed and the 
+following sequence of *request items*:
 
-  1.   The Thymeleaf *template engine*.
+  1.   The Thymeleaf *template engine* (`TemplateEngine`)
   2.   The Thymeleaf *context* (`IContext`)
   3.   The `HttpServletRequest`
   4.   The `HttpServletResponse`
-  5.   The `java.io.Writer` the result should be written to (for example, `response.getWriter()`)
+  5.   The `java.io.Writer` the result should be written to (for example, 
+       `response.getWriter()`)
+
+Put as code:
   
     tiles.render("myDefinition", templateEngine, ctx, request, response, writer);
   
@@ -202,16 +224,20 @@ Will specify a fragment you can use in your definitions with:
 Mixing Thymeleaf and JSP
 ------------------------
 
-For a better legacy integration and a smoother migration of applications, Thymeleaf templates and JSPs can
-be mixed together in Tiles definitions, and they can even *communicate*, so that they can see the variables
+For a better legacy integration and a smoother migration of applications,
+Thymeleaf templates and JSPs can be mixed together in Tiles definitions,
+and they can even *communicate*, so that they can see the variables
 that the other define:
 
   *   Thymeleaf attribute included into Thymeleaf template:
-    *   Attribute can see all local variables (e.g. `th:with`) defined in template.
+    *   Attribute can see all local variables (e.g. `th:with`) defined in 
+        template.
   *   Thymeleaf attribute included into JSP template:
-    *   Attribute can see all variables defined (e.g. `<c:set.../>`) with at least *request scope* in the JSP.
+    *   Attribute can see all variables defined (e.g. `<c:set.../>`) with
+        at least *request scope* in the JSP.
   *   JSP attribute included into Thymeleaf template:
-    *   Attribute can see all local variables (e.g. `th:with`) defined in templates as *request attributes*.
+    *   Attribute can see all local variables (e.g. `th:with`) defined in
+        templates as *request attributes*.
     
     
   
