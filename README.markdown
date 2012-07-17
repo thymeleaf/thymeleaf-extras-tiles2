@@ -8,7 +8,7 @@ Requirements
 ------------
 
   *   Thymeleaf **2.0.10**
-  *   Apache Tiles **2.2.1+** (**2.2.2** recommended)
+  *   Apache Tiles 2 version **2.2.1+** (**2.2.2** recommended)
   *   Web environment (Tiles integration cannot work offline)
 
 Features
@@ -86,10 +86,29 @@ And that's all! Now you can make your controller methods return Tiles
 definition names as view names and everything should work fine.
 
 
-Configuration without Spring
-----------------------------
+Configuration and usage without Spring
+--------------------------------------
 
-As per the Tiles 2.2 standard, implement Servlet or Listener, etc.
+Following the standard configuration mechanisms in Tiles 2.2, in order to use Thymeleaf + Tiles in
+a non-Spring application, you should:
+
+  *   Either configure an `org.thymeleaf.extras.tiles2.web.startup.ThymeleafTilesListener` at your `web.xml`
+  *   ...or configure an `org.thymeleaf.extras.tiles2.web.startup.ThymeleafTilesServlet`, also at your `web.xml`.
+
+Both of these artifacts declare an initialize a Thymeleaf-enabled `TilesContainer` instance, which you can
+access with:
+
+    final TilesContainer tiles = ServletUtil.getContainer(servletContext);
+    
+...and then execute specifying the definition to be executed and the following sequence of *request items*:
+
+  1.   The Thymeleaf *template engine*.
+  2.   The Thymeleaf *context* (`IContext`)
+  3.   The `HttpServletRequest`
+  4.   The `HttpServletResponse`
+  5.   The `java.io.Writer` the result should be written to (for example, `response.getWriter()`)
+  
+    tiles.render("myDefinition", templateEngine, ctx, request, response, writer);
   
   
 Using Thymeleaf in your definition files
