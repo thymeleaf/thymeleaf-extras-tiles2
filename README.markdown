@@ -78,7 +78,7 @@ Spring + Thymeleaf applications (*TemplateEngine* bean, *template resolvers*,
 etc.), and then create an instance of the `ThymeleafTilesConfigurer` (similar
 to the Spring Tiles configurer for JSP), like:
 
-```java
+```xml
     <bean id="tilesConfigurer" class="org.thymeleaf.extras.tiles2.spring.web.configurer.ThymeleafTilesConfigurer">
       <property name="definitions">
         <list>
@@ -91,14 +91,17 @@ to the Spring Tiles configurer for JSP), like:
 Also, you will need to configure your Thymeleaf *view resolver* in order to
 use a specialized Thymeleaf-Tiles2 view class:
 
+```xml
     <bean id="tilesViewResolver" class="org.thymeleaf.spring3.view.ThymeleafViewResolver">
       <property name="viewClass" value="org.thymeleaf.extras.tiles2.spring.web.view.ThymeleafTilesView"/>
       <property name="templateEngine" ref="templateEngine" />
     </bean>
+```
 
 ...and finally, add the Tiles dialect to your Template Engine so that you
 can use the `tiles:*` attributes:
 
+```xml
     <bean id="templateEngine" class="org.thymeleaf.spring3.SpringTemplateEngine">
       ...
       <property name="additionalDialects">
@@ -108,6 +111,7 @@ can use the `tiles:*` attributes:
       </property>
 	  ...
     </bean>
+```
 
 And that's all! Now you can make your controller methods return Tiles 
 definition names as view names and everything should work fine.
@@ -127,7 +131,9 @@ use Thymeleaf + Tiles in a non-Spring application, you should:
 Both of these artifacts declare and initialize a Thymeleaf-enabled 
 `TilesContainer` instance, which you can access with:
 
+```java
     final TilesContainer tiles = ServletUtil.getContainer(servletContext);
+```
     
 ...and then execute specifying the definition to be executed and the 
 following sequence of *request items*:
@@ -141,7 +147,9 @@ following sequence of *request items*:
 
 Put as code:
   
+```java
     tiles.render("myDefinition", templateEngine, ctx, request, response, writer);
+```
   
   
 Using Thymeleaf in your definition files
@@ -171,6 +179,7 @@ Using Thymeleaf in your definition files (usually called something like
 
 A quick example:
 
+```xml
     <tiles-definitions>
       ...  
       <definition name="main" template="basic_layout">
@@ -183,6 +192,7 @@ A quick example:
       </definition>
       ...
     </tiles-definitions>
+```
 
   
 Inserting attributes
@@ -191,6 +201,7 @@ Inserting attributes
 The new `tiles` dialect allows you to insert Tiles attributes easily,
 just as you'd do with `th:include`:
 
+```xml
     <html xmlns:th="http://www.thymeleaf.org" xmlns:tiles="http://www.thymeleaf.org">
       ...
       <body>
@@ -201,6 +212,7 @@ just as you'd do with `th:include`:
 	    ...
 	  </body>
 	</html>
+```
 
 That `tiles:include` will work equivalently to the Standard Dialect's
 `th:include`, only inserting a Tiles attribute by its name (as specified
@@ -208,9 +220,11 @@ in the definition file) instead of another template.
 
 Another possibility, `tiles:substituteby`:
 
+```xml
     <div tiles:substituteby="side">
 	   some prototyping markup over here...
 	</div>
+```
 
 ...will work almost exactly as `tiles:include`, but substituting the
 containing `<div>` tag by the attribute contents, instead of inserting
@@ -218,18 +232,24 @@ these contents inside it.
 
 What about inserting *string* attributes? Easy:
 
+```xml
     <span tiles:string="some_string_attribute">blah blah</span>
+```
 
 And there's one more attribute, which allows you to (optionally) specify 
 which parts of your template you will be using as a fragment. So:
 
+```xml
     <div tiles:fragment="text">
 	   lorem ipsum sic dolor amet blah blah...
 	</div>
+```
 
 ...will specify a fragment you can use in your definitions with:
   
+```xml
     <put-attribute name="text" value="main :: text" />
+```
 
   
 Mixing Thymeleaf and JSP
