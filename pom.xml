@@ -25,7 +25,7 @@
   <artifactId>thymeleaf-extras-tiles2</artifactId>
   <packaging>jar</packaging>
   <version>1.0.0-beta1</version>
-  <name>thymeleaf-tiles2</name>
+  <name>thymeleaf-extras-tiles2</name>
   <url>http://www.thymeleaf.org</url>
 
   <description>XML/XHTML/HTML5 template engine for Java</description>
@@ -44,9 +44,9 @@
   </organization>
   
   <scm>
-    <url>scm:git:git@github.com:thymeleaf/thymeleaf-tiles2.git</url>
-    <connection>scm:git:git@github.com:thymeleaf/thymeleaf-tiles2.git</connection>
-    <developerConnection>scm:git:git@github.com:thymeleaf/thymeleaf-tiles2.git</developerConnection>
+    <url>scm:git:git@github.com:thymeleaf/thymeleaf-extras-tiles2.git</url>
+    <connection>scm:git:git@github.com:thymeleaf/thymeleaf-extras-tiles2.git</connection>
+    <developerConnection>scm:git:git@github.com:thymeleaf/thymeleaf-extras-tiles2.git</developerConnection>
   </scm>
   
   <developers>
