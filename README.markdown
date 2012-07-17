@@ -183,7 +183,18 @@ Will specify a fragment you can use in your definitions with:
 Mixing Thymeleaf and JSP
 ------------------------
 
-  Definition with both, example of Thymeleaf -> JSP, example of JSP -> Thymeleaf
+For a better legacy integration and a smoother migration of applications, Thymeleaf templates and JSPs can
+be mixed together in Tiles definitions, and they can even *communicate*, so that they can see the variables
+that the other define:
+
+  *   Thymeleaf attribute included into Thymeleaf template:
+    *   Attribute can see all local variables (e.g. `th:with`) defined in template.
+  *   Thymeleaf attribute included into JSP template:
+    *   Attribute can see all variables defined (e.g. `<c:set.../>`) with at least *request scope* in the JSP.
+  *   JSP attribute included into Thymeleaf template:
+    *   Attribute can see all local variables (e.g. `th:with`) defined in templates as *request attributes*.
+    
+    
   
 
   
