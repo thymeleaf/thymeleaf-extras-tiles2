@@ -11,20 +11,29 @@ This is a *thymeleaf extras* module, not a part of the Thymeleaf core (and as
 such following its own versioning schema), but fully supported by the 
 Thymeleaf team.
 
+Current version: **1.0.0-beta1**
+
 
 License
 -------
 
-This software module is licensed under the [Apache License 2.0]
+This software is licensed under the [Apache License 2.0]
 (http://www.apache.org/licenses/LICENSE-2.0.html).
 
 
 Requirements
 ------------
 
-  *   Thymeleaf **2.0.10**
+  *   Thymeleaf **2.0.10+**
   *   Apache Tiles 2 version **2.2.1+** (**2.2.2** recommended)
   *   Web environment (Tiles integration cannot work offline)
+
+
+Maven info
+----------
+
+  *   groupId: `org.thymeleaf.extras`   
+  *   artifactId: `thymeleaf-extras-tiles2`
 
 
 Features
@@ -65,9 +74,9 @@ Configuration with Spring
 
 In order to use Apache Tiles 2 with Thymeleaf in your Spring MVC application,
 you will first need to configure your application in the usual way for
-Thymeleaf applications (*TemplateEngine* bean, *template resolvers*, etc.),
-and then create an instance of the `ThymeleafTilesConfigurer` (similar to
-the Spring Tiles configurer for JSP), like:
+Spring + Thymeleaf applications (*TemplateEngine* bean, *template resolvers*, 
+etc.), and then create an instance of the `ThymeleafTilesConfigurer` (similar
+to the Spring Tiles configurer for JSP), like:
 
     <bean id="tilesConfigurer" class="org.thymeleaf.extras.tiles2.spring.web.configurer.ThymeleafTilesConfigurer">
       <property name="definitions">
@@ -143,16 +152,16 @@ Using Thymeleaf in your definition files (usually called something like
     *   You can use `type="thymeleaf"` or simply omit `type`, for both your
         templates and attributes.
 	*   You can use `type="jsp"` for your JSP templates and attributes.
-  *   Thymeleaf value syntax equivalent to fragment inclusions in
-      `th:include` or `th:substituteby` attributes:
-	  `"TEMPLATESELECTOR (:: FRAGMENTSELECTOR)?"`:
+  *   Thymeleaf value syntax is equivalent to that of  `th:include` and
+      `th:substituteby` attributes:
+	  `"TEMPLATESELECTOR (:: FRAGMENTSELECTOR)?"`
 	  *   Template Selector:
 	    *    Understandable by the template resolvers you configured, just as
-             with any other thymeleaf template.
+             with any other thymeleaf templates.
 		*    Can use Standard Expressions: `${...}`, `*{...}`, literals,
 		operands, etc. (externalized messages and links are *not allowed*).
 	  *   Fragment Selector (optional): 
-	    *    Can specify fragments by name (using `tiles:fragment`).
+	    *    Can specify fragments by name (using attribute `tiles:fragment`).
 		*    Can specify XPath-like DOM Selector (`[//div[@id='content']`)
 		*    Can use Standard Expressions: `${...}`, `*{...}`, literals,
 		operands, etc. (externalized messages and links are *not allowed*).
@@ -177,11 +186,11 @@ A quick example:
 Inserting attributes
 --------------------
 
-The new **`tiles`** dialect allows you to insert Tiles attribute easily,
+The new `tiles` dialect allows you to insert Tiles attributes easily,
 just as you'd do with `th:include`:
 
-    <html xmlns:th="http://www.thymeleaf.org"
-	      xmlns:tiles="http://www.thymeleaf.org">
+    <html xmlns:th="http://www.thymeleaf.org" xmlns:tiles="http://www.thymeleaf.org">
+      ...
       <body>
 	    ...
 	    <div tiles:include="side">
@@ -216,7 +225,7 @@ which parts of your template you will be using as a fragment. So:
 	   lorem ipsum sic dolor amet blah blah...
 	</div>
 
-Will specify a fragment you can use in your definitions with:
+...will specify a fragment you can use in your definitions with:
   
     <put-attribute name="text" value="main :: text" />
 
