@@ -53,7 +53,7 @@
     <developer>
       <id>dfernandez</id>
       <name>Daniel Fernandez</name>
-      <email>dfernandez AT users.sourceforge.net</email>
+      <email>daniel.fernandez AT 11thlabs DOT org</email>
       <roles>
         <role>Project admin</role>
       </roles>
@@ -197,6 +197,20 @@
   <dependencies>
     
     <dependency>
+      <groupId>org.thymeleaf</groupId>
+      <artifactId>thymeleaf</artifactId>
+      <version>2.0.10</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.thymeleaf</groupId>
+      <artifactId>thymeleaf-spring3</artifactId>
+      <version>2.0.10</version>
+      <scope>compile</scope>
+      <optional>true</optional>
+    </dependency>
+      
+    <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
       <version>2.5</version>
@@ -208,20 +222,6 @@
       <artifactId>jsp-api</artifactId>
       <version>2.1</version>
       <scope>provided</scope>
-      <optional>true</optional>
-    </dependency>
-    
-    <dependency>
-      <groupId>org.thymeleaf</groupId>
-      <artifactId>thymeleaf</artifactId>
-      <version>2.0.9-SNAPSHOT</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.thymeleaf</groupId>
-      <artifactId>thymeleaf-spring3</artifactId>
-      <version>2.0.9-SNAPSHOT</version>
-      <scope>compile</scope>
       <optional>true</optional>
     </dependency>
     
