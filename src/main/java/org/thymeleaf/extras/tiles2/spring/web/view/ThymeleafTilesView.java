@@ -41,7 +41,7 @@ import org.thymeleaf.extras.tiles2.spring.web.configurer.ThymeleafTilesConfigure
 import org.thymeleaf.spring3.SpringTemplateEngine;
 import org.thymeleaf.spring3.context.SpringWebContext;
 import org.thymeleaf.spring3.naming.SpringContextVariableNames;
-import org.thymeleaf.spring3.view.ThymeleafView;
+import org.thymeleaf.spring3.view.AbstractThymeleafView;
 
 
 
@@ -50,7 +50,7 @@ import org.thymeleaf.spring3.view.ThymeleafView;
  * @author Daniel Fern&aacute;ndez
  *
  */
-public class ThymeleafTilesView extends ThymeleafView {
+public class ThymeleafTilesView extends AbstractThymeleafView {
     
     
     
@@ -59,10 +59,10 @@ public class ThymeleafTilesView extends ThymeleafView {
         super();
     }
 
-    
-    
 
-    @Override
+    
+    
+    
     public void render(final Map<String, ?> model, final HttpServletRequest request, final HttpServletResponse response) 
             throws Exception {
 
@@ -78,6 +78,7 @@ public class ThymeleafTilesView extends ThymeleafView {
             throw new IllegalArgumentException("Property 'templateEngine' is required");
         }
         
+
         final Map<String, Object> mergedModel = new HashMap<String, Object>();
         
         final Map<String, Object> staticVariables = this.getStaticVariables();
@@ -127,7 +128,7 @@ public class ThymeleafTilesView extends ThymeleafView {
         }
 
         
-        exposeModelAsRequestAttributes(model, request);
+        exposeModelAsRequestAttributes(mergedModel, request);
         JstlUtils.exposeLocalizationContext(requestContext);
         
         
