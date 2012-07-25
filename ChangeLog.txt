@@ -1,6 +1,7 @@
 1.0.0-beta2
 ===========
 - Fixed NullPointerException in ThymeleafTilesView when Model is null.
+- Refactored ThymeleafTilesView as a subclass of AbstractThymeleafView
 
 
 1.0.0-beta1
