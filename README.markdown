@@ -24,7 +24,7 @@ This software is licensed under the [Apache License 2.0]
 Requirements
 ------------
 
-  *   Thymeleaf **2.0.10+**
+  *   Thymeleaf **2.0.11+**
   *   Apache Tiles 2 version **2.2.1+** (**2.2.2** recommended)
   *   Web environment (Tiles integration cannot work offline)
 
