@@ -221,13 +221,13 @@
     <dependency>
       <groupId>org.thymeleaf</groupId>
       <artifactId>thymeleaf</artifactId>
-      <version>2.0.11</version>
+      <version>2.0.12-SNAPSHOT</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.thymeleaf</groupId>
       <artifactId>thymeleaf-spring3</artifactId>
-      <version>2.0.11</version>
+      <version>2.0.12-SNAPSHOT</version>
       <scope>compile</scope>
       <optional>true</optional>
     </dependency>
@@ -308,7 +308,22 @@
       <scope>compile</scope>
       <optional>true</optional>
     </dependency>
-  
+    
+    <dependency>
+      <groupId>org.springframework.webflow</groupId>
+      <artifactId>spring-webflow</artifactId>
+      <version>2.3.1.RELEASE</version>
+      <scope>provided</scope>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.webflow</groupId>
+      <artifactId>spring-js</artifactId>
+      <version>2.3.1.RELEASE</version>
+      <scope>provided</scope>
+      <optional>true</optional>
+    </dependency>
+    
   
     <dependency>
       <groupId>org.slf4j</groupId>
