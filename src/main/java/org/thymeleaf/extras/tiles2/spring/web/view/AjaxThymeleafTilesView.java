@@ -46,6 +46,7 @@ import org.thymeleaf.context.IProcessingContext;
 import org.thymeleaf.exceptions.ConfigurationException;
 import org.thymeleaf.extras.tiles2.context.ThymeleafTilesRequestContextFactory;
 import org.thymeleaf.extras.tiles2.spring.web.configurer.ThymeleafTilesConfigurer;
+import org.thymeleaf.spring3.view.AjaxEnabledView;
 
 
 /**
@@ -69,7 +70,7 @@ import org.thymeleaf.extras.tiles2.spring.web.configurer.ThymeleafTilesConfigure
  * 
  * @author Daniel Fern&aacute;ndez
  */
-public class AjaxThymeleafTilesView extends ThymeleafTilesView {
+public class AjaxThymeleafTilesView extends ThymeleafTilesView implements AjaxEnabledView {
 
     
     private static final Logger vlogger = LoggerFactory.getLogger(AjaxThymeleafTilesView.class);
@@ -90,41 +91,12 @@ public class AjaxThymeleafTilesView extends ThymeleafTilesView {
     
     
 
-    /**
-     * <p>
-     *   Return the AJAX handler (from Spring Javascript) used
-     *   to determine whether a request is an AJAX request or not.
-     * </p>
-     * <p>
-     *   This view class should be used with an instance of
-     *   {@link AjaxThymeleafViewResolver} or any of its subclasses,
-     *   so that {@link #setAjaxHandler(AjaxHandler)} can be called by
-     *   the resolver when resolving the view, setting the default
-     *   AJAX handler being used.
-     * </p>
-     * 
-     * @return the AJAX handler.
-     */
+
     public AjaxHandler getAjaxHandler() {
         return this.ajaxHandler;
     }
 
     
-    /**
-     * <p>
-     *   Sets the AJAX handler (from Spring Javascript) used
-     *   to determine whether a request is an AJAX request or not.
-     * </p>
-     * <p>
-     *   This view class should be used with an instance of
-     *   {@link AjaxThymeleafViewResolver} or any of its subclasses,
-     *   so that {@link #setAjaxHandler(AjaxHandler)} can be called by
-     *   the resolver when resolving the view, setting the default
-     *   AJAX handler being used.
-     * </p>
-     * 
-     * @param ajaxHandler the AJAX handler.
-     */
     public void setAjaxHandler(final AjaxHandler ajaxHandler) {
         this.ajaxHandler = ajaxHandler;
     }
