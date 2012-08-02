@@ -71,14 +71,39 @@ public class ThymeleafTilesView extends AbstractThymeleafView {
         if (getTemplateName() == null) {
             throw new IllegalArgumentException("Property 'templateName' is required");
         }
-        if (getLocale() == null) {
-            throw new IllegalArgumentException("Property 'locale' is required");
-        }
         if (getTemplateEngine() == null) {
             throw new IllegalArgumentException("Property 'templateEngine' is required");
         }
         
+        final IProcessingContext processingContext = buildContextAndPrepareResponse(model, request, response);
 
+        final TemplateEngine viewTemplateEngine = getTemplateEngine();
+        
+        final TilesContainer container = ServletUtil.getContainer(servletContext);
+        if (container == null) {
+            throw new ServletException(
+                    "Tiles container is not initialized. " +
+                    "Have you added a " + ThymeleafTilesConfigurer.class.getSimpleName() + " to " +
+                    "your web application context?");
+        }
+        
+        container.render(getTemplateName(), viewTemplateEngine, processingContext, request, response, response.getWriter());
+        
+    }
+
+
+    
+    
+    protected IProcessingContext buildContextAndPrepareResponse(
+            final Map<String, ?> model, final HttpServletRequest request, final HttpServletResponse response) 
+            throws Exception {
+
+        final ServletContext servletContext = getServletContext();
+
+        if (getLocale() == null) {
+            throw new IllegalArgumentException("Property 'locale' is required");
+        }
+        
         final Map<String, Object> mergedModel = new HashMap<String, Object>();
         
         final Map<String, Object> staticVariables = this.getStaticVariables();
@@ -103,8 +128,6 @@ public class ThymeleafTilesView extends AbstractThymeleafView {
                 new SpringWebContext(request, response, servletContext , getLocale(), mergedModel, getApplicationContext());
         final IProcessingContext processingContext = new ProcessingContext(context);
         
-        final TemplateEngine viewTemplateEngine = getTemplateEngine();
-        
         final String templateContentType = getContentType();
         final Locale templateLocale = getLocale();
         final String templateCharacterEncoding = getCharacterEncoding();
@@ -119,24 +142,14 @@ public class ThymeleafTilesView extends AbstractThymeleafView {
             response.setCharacterEncoding(templateCharacterEncoding);
         }
         
-        TilesContainer container = ServletUtil.getContainer(servletContext);
-        if (container == null) {
-            throw new ServletException(
-                    "Tiles container is not initialized. " +
-                    "Have you added a " + ThymeleafTilesConfigurer.class.getSimpleName() + " to " +
-                    "your web application context?");
-        }
-
-        
         exposeModelAsRequestAttributes(mergedModel, request);
         JstlUtils.exposeLocalizationContext(requestContext);
-        
-        
-        container.render(getTemplateName(), viewTemplateEngine, processingContext, request, response, response.getWriter());
+
+        return processingContext;
         
     }
-
-
+    
+    
 
 
     @Override
