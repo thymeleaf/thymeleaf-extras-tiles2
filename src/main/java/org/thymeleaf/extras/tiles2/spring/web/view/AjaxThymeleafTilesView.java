@@ -39,7 +39,6 @@ import org.apache.tiles.servlet.context.ServletUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.js.ajax.AjaxHandler;
-import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.IProcessingContext;
@@ -213,14 +212,9 @@ public class AjaxThymeleafTilesView extends ThymeleafTilesView implements AjaxEn
 
     /**
      * <p>
-     *   Iterate over all attributes in the given Tiles definition. Every attribute value that represents a template (i.e.
-     *   start with "/") or is a nested definition is added to a Map. The method class itself recursively to traverse
-     *   nested definitions.
-     * </p>
-     * <p>
-     *   Copied from {@link org.springframework.js.ajax.tiles2.AjaxTilesView}#flattenAttributeMap(BasicTilesContainer, TilesRequestContext, Map, Definition, HttpServletRequest, HttpServletResponse).
-     *   Original authors of {@link org.springframework.js.ajax.tiles2.AjaxTilesView} are
-     *   Jeremy Grelle and David Winterfeldt.
+     *   Iterate over all attributes in the given Tiles definition. Every attribute in the defintion
+     *   is added to the map, and attributes which are definitions themselves will be recursively
+     *   processed.
      * </p>
      * 
      * @param container the TilesContainer
@@ -236,20 +230,23 @@ public class AjaxThymeleafTilesView extends ThymeleafTilesView implements AjaxEn
             final HttpServletRequest request, final HttpServletResponse response) {
         
         final Iterator<String> iterator = compositeDefinition.getAttributeNames();
+        
         while (iterator.hasNext()) {
             
-            String attributeName = iterator.next();
-            Attribute attribute = compositeDefinition.getAttribute(attributeName);
+            final String attributeName = iterator.next();
+            final Attribute attribute = compositeDefinition.getAttribute(attributeName);
+            
             if (attribute.getValue() == null || !(attribute.getValue() instanceof String)) {
                 continue;
             }
+         
+            resultMap.put(attributeName, attribute);
+            
             final String value = attribute.getValue().toString();
-            if (value.startsWith("/")) {
-                resultMap.put(attributeName, attribute);
-            } else if (container.isValidDefinition(value, new Object[] { request, response })) {
-                resultMap.put(attributeName, attribute);
+            
+            if (container.isValidDefinition(value, new Object[] { request, response })) {
+                // It is a nested definition, so we have to nest the attribute definitions
                 final Definition nestedDefinition = container.getDefinitionsFactory().getDefinition(value, requestContext);
-                Assert.isTrue(nestedDefinition != compositeDefinition, "Circular nested definition: " + value);
                 flattenAttributeMap(container, requestContext, resultMap, nestedDefinition, request, response);
             }
             
@@ -263,11 +260,6 @@ public class AjaxThymeleafTilesView extends ThymeleafTilesView implements AjaxEn
      *   Iterate over dynamically added Tiles attributes (see "Runtime Composition" in the Tiles documentation) and add
      *   them to the output Map passed as input.
      * </p>
-     * <p>
-     *   Copied from {@link org.springframework.js.ajax.tiles2.AjaxTilesView}#flattenAttributeMap(BasicTilesContainer, TilesRequestContext, Map, Definition, HttpServletRequest, HttpServletResponse).
-     *   Original authors of {@link org.springframework.js.ajax.tiles2.AjaxTilesView} are
-     *   Jeremy Grelle and David Winterfeldt.
-     * </p>
      * 
      * @param container the Tiles container
      * @param resultMap the output Map where attributes of interest are added to.
@@ -277,6 +269,12 @@ public class AjaxThymeleafTilesView extends ThymeleafTilesView implements AjaxEn
     protected void addRuntimeAttributes(
             final BasicTilesContainer container, final Map<String,Attribute> resultMap, 
             final HttpServletRequest request, final HttpServletResponse response) {
+
+        /*
+         *   Copied from {@link org.springframework.js.ajax.tiles2.AjaxTilesView}#flattenAttributeMap(BasicTilesContainer, TilesRequestContext, Map, Definition, HttpServletRequest, HttpServletResponse).
+         *   Original authors of {@link org.springframework.js.ajax.tiles2.AjaxTilesView} are
+         *   Jeremy Grelle and David Winterfeldt.
+         */
         
         final AttributeContext attributeContext = container.getAttributeContext(new Object[] { request, response });
         Set<String> attributeNames = new HashSet<String>();
