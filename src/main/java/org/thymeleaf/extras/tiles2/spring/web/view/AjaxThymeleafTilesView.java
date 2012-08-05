@@ -277,7 +277,7 @@ public class AjaxThymeleafTilesView extends ThymeleafTilesView implements AjaxEn
          */
         
         final AttributeContext attributeContext = container.getAttributeContext(new Object[] { request, response });
-        Set<String> attributeNames = new HashSet<String>();
+        final Set<String> attributeNames = new HashSet<String>();
         if (attributeContext.getLocalAttributeNames() != null) {
             attributeNames.addAll(attributeContext.getLocalAttributeNames());
         }
@@ -286,9 +286,8 @@ public class AjaxThymeleafTilesView extends ThymeleafTilesView implements AjaxEn
         }
         final Iterator<String> iterator = attributeNames.iterator();
         while (iterator.hasNext()) {
-            String name = iterator.next();
-            Attribute attr = attributeContext.getAttribute(name);
-            resultMap.put(name, attr);
+            final String attributeName = iterator.next();
+            resultMap.put(attributeName, attributeContext.getAttribute(attributeName));
         }
         
     }
