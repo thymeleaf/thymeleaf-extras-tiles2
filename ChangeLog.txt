@@ -4,6 +4,8 @@
 - Refactored ThymeleafTilesView as a subclass of AbstractThymeleafView.
 - Added support for Spring WebFlow's AJAX fragment rendering at AjaxThymeleafTilesView
   and FlowThymeleafTilesView.
+- Removed references to request.getSession() that could unnecessarily create a
+  new session for the user just for obtaining the ServletContext object.
 
 
 1.0.0-beta1

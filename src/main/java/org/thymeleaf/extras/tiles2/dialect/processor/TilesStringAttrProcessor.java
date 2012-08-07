@@ -98,7 +98,7 @@ public class TilesStringAttrProcessor
         
         final HttpServletRequest request = webContext.getHttpServletRequest();
         final HttpServletResponse response = webContext.getHttpServletResponse();
-        final ServletContext servletContext = request.getSession().getServletContext();
+        final ServletContext servletContext = webContext.getServletContext();
         
         final TilesContainer tilesContainer = ServletUtil.getContainer(servletContext);
 

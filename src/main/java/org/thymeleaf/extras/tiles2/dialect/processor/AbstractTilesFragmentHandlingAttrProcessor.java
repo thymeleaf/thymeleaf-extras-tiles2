@@ -92,7 +92,7 @@ public abstract class AbstractTilesFragmentHandlingAttrProcessor
         
         final HttpServletRequest request = webContext.getHttpServletRequest();
         final HttpServletResponse response = webContext.getHttpServletResponse();
-        final ServletContext servletContext = request.getSession().getServletContext();
+        final ServletContext servletContext = webContext.getServletContext();
         
         final LocalVariablesHttpServletRequest localVariablesHttpServletRequest =
                 new LocalVariablesHttpServletRequest(request, processingContext.getLocalVariables());
