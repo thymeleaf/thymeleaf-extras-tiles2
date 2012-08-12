@@ -136,10 +136,11 @@ public class AjaxThymeleafTilesView extends ThymeleafTilesView implements AjaxEn
             if (getTemplateName() == null) {
                 throw new IllegalArgumentException("Property 'templateName' is required");
             }
-            
-            final IProcessingContext processingContext = buildContextAndPrepareResponse(model, request, response);
 
             final TemplateEngine viewTemplateEngine = getTemplateEngine();
+            
+            final IProcessingContext processingContext = 
+                    buildContextAndPrepareResponse(viewTemplateEngine, model, request, response);
             
             final BasicTilesContainer container = (BasicTilesContainer) ServletUtil.getContainer(servletContext);
             if (container == null) {

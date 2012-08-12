@@ -34,9 +34,9 @@ import org.springframework.web.servlet.support.JstlUtils;
 import org.springframework.web.servlet.support.RequestContext;
 import org.springframework.web.servlet.view.AbstractTemplateView;
 import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.DialectAwareProcessingContext;
 import org.thymeleaf.context.IProcessingContext;
 import org.thymeleaf.context.IWebContext;
-import org.thymeleaf.context.ProcessingContext;
 import org.thymeleaf.extras.tiles2.spring.web.configurer.ThymeleafTilesConfigurer;
 import org.thymeleaf.spring3.SpringTemplateEngine;
 import org.thymeleaf.spring3.context.SpringWebContext;
@@ -74,10 +74,11 @@ public class ThymeleafTilesView extends AbstractThymeleafView {
         if (getTemplateEngine() == null) {
             throw new IllegalArgumentException("Property 'templateEngine' is required");
         }
-        
-        final IProcessingContext processingContext = buildContextAndPrepareResponse(model, request, response);
 
         final TemplateEngine viewTemplateEngine = getTemplateEngine();
+        
+        final IProcessingContext processingContext = 
+                buildContextAndPrepareResponse(viewTemplateEngine, model, request, response);
         
         final TilesContainer container = ServletUtil.getContainer(servletContext);
         if (container == null) {
@@ -95,7 +96,8 @@ public class ThymeleafTilesView extends AbstractThymeleafView {
     
     
     protected IProcessingContext buildContextAndPrepareResponse(
-            final Map<String, ?> model, final HttpServletRequest request, final HttpServletResponse response) 
+            final TemplateEngine templateEngine, final Map<String, ?> model, 
+            final HttpServletRequest request, final HttpServletResponse response) 
             throws Exception {
 
         final ServletContext servletContext = getServletContext();
@@ -126,7 +128,8 @@ public class ThymeleafTilesView extends AbstractThymeleafView {
         
         final IWebContext context = 
                 new SpringWebContext(request, response, servletContext , getLocale(), mergedModel, getApplicationContext());
-        final IProcessingContext processingContext = new ProcessingContext(context);
+        final IProcessingContext processingContext = 
+                new DialectAwareProcessingContext(context, templateEngine.getDialects());
         
         final String templateContentType = getContentType();
         final Locale templateLocale = getLocale();

@@ -35,9 +35,9 @@ import org.apache.tiles.servlet.context.ServletTilesRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.DialectAwareProcessingContext;
 import org.thymeleaf.context.IContext;
 import org.thymeleaf.context.IProcessingContext;
-import org.thymeleaf.context.ProcessingContext;
 import org.thymeleaf.extras.tiles2.naming.ThymeleafTilesNaming;
 
 
@@ -92,7 +92,10 @@ public class ThymeleafTilesRequestContextFactory
             
             final IProcessingContext processingContext =
                     (contextObject instanceof IProcessingContext?
-                            (IProcessingContext)contextObject : new ProcessingContext((IContext)contextObject));
+                            (IProcessingContext)contextObject : 
+                             new DialectAwareProcessingContext(
+                                    (IContext)contextObject, 
+                                    templateEngine.getConfiguration().getDialects().values()));
             
             /*
              * Add TemplateEngine, ProcessingContext and Writer as attributes to the request,
