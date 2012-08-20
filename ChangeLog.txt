@@ -7,6 +7,8 @@
   and FlowThymeleafTilesView.
 - Removed references to request.getSession() that could unnecessarily create a
   new session for the user just for obtaining the ServletContext object.
+- Adapted attribute renderer to the core's new way of deciding whether a fragment 
+  should return the resulting container element or just its children.
 
 
 1.0.0-beta1

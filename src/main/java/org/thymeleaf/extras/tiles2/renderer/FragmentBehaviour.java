@@ -17,26 +17,36 @@
  * 
  * =============================================================================
  */
-package org.thymeleaf.extras.tiles2.naming;
+package org.thymeleaf.extras.tiles2.renderer;
 
+import org.thymeleaf.util.Validate;
 
+public class FragmentBehaviour {
 
-
-/**
- * 
- * @author Daniel Fern&aacute;ndez
- *
- */
-public final class ThymeleafTilesNaming {
-
-    
-    public static final String TEMPLATE_ENGINE_ATTRIBUTE_NAME = "%%THYMELEAF_TEMPLATE_ENGINE%%";
-    public static final String PROCESSING_CONTEXT_ATTRIBUTE_NAME = "%%THYMELEAF_PROCESSING_CONTEXT%%";
-    public static final String FRAGMENT_BEHAVIOUR_ATTRIBUTE_NAME = "%%THYMELEAF_FRAGMENT_BEHAVIOUR%%";
+    private final String attributeOrDefinitionName;
+    private boolean displayOnlyChildren = false;
     
     
-    private ThymeleafTilesNaming() {
+    public FragmentBehaviour(final String attributeOrDefinitionName) {
         super();
+        Validate.notNull(attributeOrDefinitionName, "Attribute/Definition name cannot be null");
+        this.attributeOrDefinitionName = attributeOrDefinitionName;
     }
+
+
+    public String getAttributeOrDefinitionName() {
+        return this.attributeOrDefinitionName;
+    }
+
+
+    public boolean isDisplayOnlyChildren() {
+        return this.displayOnlyChildren;
+    }
+
+
+    public void setDisplayOnlyChildren(final boolean displayOnlyChildren) {
+        this.displayOnlyChildren = displayOnlyChildren;
+    }
+    
     
 }

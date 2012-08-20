@@ -109,9 +109,17 @@ public class ThymeleafAttributeRenderer
                 (TemplateEngine) request.getAttribute(ThymeleafTilesNaming.TEMPLATE_ENGINE_ATTRIBUTE_NAME);
         final IProcessingContext processingContext = 
                 (IProcessingContext) request.getAttribute(ThymeleafTilesNaming.PROCESSING_CONTEXT_ATTRIBUTE_NAME);
-
+        
+        // This might not have been set
+        final FragmentBehaviour fragmentBehaviour = 
+                (FragmentBehaviour) request.getAttribute(ThymeleafTilesNaming.FRAGMENT_BEHAVIOUR_ATTRIBUTE_NAME);
+        
         
         if (tilesRequestContext instanceof JspTilesRequestContext) {
+            
+            // If our Thymeleaf template is being executed from a JSP, we should
+            // first flush the associated JspWriter (because it will be buffering
+            // instead of directly writing to the response.getWriter() we will be writing.
 
             if (logger.isTraceEnabled()) {
                 logger.trace("[THYMELEAF][{}] Current Tiles Request Context is a JSP" +
@@ -120,18 +128,25 @@ public class ThymeleafAttributeRenderer
                         new Object[] {TemplateEngine.threadIndex()});
             }
             
-            // If our Thymeleaf template is being executed from a JSP, we should
-            // first flush the associated JspWriter (because it will be buffering
-            // instead of directly writing to the response.getWriter() we will be writing.
             final JspTilesRequestContext jspTilesRequestContext = (JspTilesRequestContext) tilesRequestContext;
             final PageContext pageContext = jspTilesRequestContext.getPageContext();
             pageContext.getOut().flush();
             
         }
         
+        boolean displayOnlySelectionChildren = false;
+        if (fragmentBehaviour != null) {
+            final String attributeOrDefinitionName = fragmentBehaviour.getAttributeOrDefinitionName();
+            if (attributeOrDefinitionName.equals(value)) {
+                // Will only apply this fragment behaviour if it was specified for this
+                // specific definition or attribute (this avoids problems in TH->JSP->TH scenarios).
+                displayOnlySelectionChildren = fragmentBehaviour.isDisplayOnlyChildren();
+            }
+            request.removeAttribute(ThymeleafTilesNaming.FRAGMENT_BEHAVIOUR_ATTRIBUTE_NAME);
+        }
         
         final FragmentAndTarget fragmentAndTarget = 
-                computeTemplateSelector(templateEngine, processingContext, templateSelector);
+                computeTemplateSelector(templateEngine, processingContext, templateSelector, displayOnlySelectionChildren);
 
         final String templateName = fragmentAndTarget.getTemplateName();
         final IFragmentSpec fragmentSpec = fragmentAndTarget.getFragmentSpec();
@@ -150,7 +165,8 @@ public class ThymeleafAttributeRenderer
     
     
     private static FragmentAndTarget computeTemplateSelector(final TemplateEngine templateEngine, 
-            final IProcessingContext processingContext, final String templateSelector) {
+            final IProcessingContext processingContext, final String templateSelector,
+            final boolean displayOnlySelectionChildren) {
 
         if (!templateEngine.isInitialized()) { 
             templateEngine.initialize();
@@ -163,7 +179,7 @@ public class ThymeleafAttributeRenderer
         final Configuration configuration = templateEngine.getConfiguration();
         
         return StandardFragmentProcessor.computeStandardFragmentSpec(configuration, processingContext, 
-                templateSelector, null, getFragmentAttributeName(templateEngine));
+                templateSelector, null, getFragmentAttributeName(templateEngine), displayOnlySelectionChildren);
         
     }
 

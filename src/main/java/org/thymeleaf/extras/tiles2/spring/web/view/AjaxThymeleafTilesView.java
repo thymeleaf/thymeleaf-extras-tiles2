@@ -152,7 +152,7 @@ public class AjaxThymeleafTilesView extends ThymeleafTilesView implements AjaxEn
 
 
             /*
-             * Extract only the specified fragmens as Tiles "attributes"
+             * Extract only the specified fragments as Tiles "attributes"
              */
             
             final TilesRequestContext tilesRequestContext = 

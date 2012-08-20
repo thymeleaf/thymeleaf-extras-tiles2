@@ -44,6 +44,7 @@ import org.thymeleaf.dom.Macro;
 import org.thymeleaf.dom.Node;
 import org.thymeleaf.exceptions.ConfigurationException;
 import org.thymeleaf.exceptions.TemplateProcessingException;
+import org.thymeleaf.extras.tiles2.renderer.FragmentBehaviour;
 import org.thymeleaf.extras.tiles2.request.LocalVariablesHttpServletRequest;
 import org.thymeleaf.processor.attr.AbstractChildrenModifierAttrProcessor;
 
@@ -80,6 +81,8 @@ public abstract class AbstractTilesFragmentHandlingAttrProcessor
 
         final String attributeValue = element.getAttributeValue(attributeName);
         
+        final boolean replaceHostElement = getReplaceHostElement(arguments, element, attributeName);
+        
         final IContext context = arguments.getContext();
         if (!(context instanceof IWebContext)) {
             throw new ConfigurationException(
@@ -95,11 +98,28 @@ public abstract class AbstractTilesFragmentHandlingAttrProcessor
         final HttpServletResponse response = webContext.getHttpServletResponse();
         final ServletContext servletContext = webContext.getServletContext();
         
+        /*
+         * A special implementation of HttpServletRequest will make sure a (potential) JSP
+         * fragment insertion will see the currently defined local variables, without just
+         * adding them as attributes to the request, which would mean they would be available
+         * everywhere in the page (and local variables in Thymeleaf are scoped to the element
+         * they are defined in). 
+         */
         final LocalVariablesHttpServletRequest localVariablesHttpServletRequest =
                 new LocalVariablesHttpServletRequest(request, processingContext.getLocalVariables());
         
+        
+        /*
+         * We assume the TilesContainer has been declared by a factory and hooked to the
+         * ServletContext in the usual Tiles way. 
+         */
         final TilesContainer tilesContainer = ServletUtil.getContainer(servletContext);
 
+        
+        /*
+         * Initialize model execution parameters. Many parameters cannot be given a value
+         * in our dialect's attributes, so we will just assign default parameters to them.
+         */
         final boolean ignore = false;
         final String preparer = null;
         final String role = null;
@@ -109,16 +129,37 @@ public abstract class AbstractTilesFragmentHandlingAttrProcessor
         final String name = attributeValue;
         final Attribute value = null;
         
+        
+        /*
+         * Template engine is bound to the thread (as a thread local).
+         * We use a StringWriter in order to avoid anyone writing directly to the
+         * response writer (something that would mess our fragments).
+         */
         final TemplateEngine templateEngine = TemplateEngine.threadTemplateEngine();
         final StringWriter writer = new StringWriter();
         
+        
+        /*
+         * Create the fragment behaviour object that will determine whether
+         * the rendered fragment will include the containing markup element 
+         * (substituteby) or not (include).
+         */
+        final FragmentBehaviour fragmentBehaviour = new FragmentBehaviour(name);
+        fragmentBehaviour.setDisplayOnlyChildren(!replaceHostElement);
+        
+        
+        /*
+         * Actual execution of the Tiles model. This will end up triggering
+         * the ThymeleafAttributeRenderer.
+         */
         try {
             this.model.execute(
                     tilesContainer, ignore, preparer, 
                     role, defaultValue, defaultValueRole, 
                     defaultValueType, name, value,
                     templateEngine, processingContext,
-                    localVariablesHttpServletRequest, response, writer);
+                    localVariablesHttpServletRequest, response, writer,
+                    fragmentBehaviour);
         } catch (final IOException e)  {
             throw new TemplateProcessingException(
                     "Error while processing Tiles attribute \"" + name + "\"", e);
