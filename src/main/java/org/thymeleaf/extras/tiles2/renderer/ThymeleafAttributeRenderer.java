@@ -82,6 +82,7 @@ public class ThymeleafAttributeRenderer
     @Override
     public void write(final Object value, final Attribute attribute,
             final TilesRequestContext tilesRequestContext) throws IOException {
+        
 
         if (value == null) {
             throw new InvalidTemplateException("Cannot render a null template");
@@ -90,10 +91,10 @@ public class ThymeleafAttributeRenderer
             throw new InvalidTemplateException(
                     "Cannot render a template that is not a String ('" + value.getClass().getName() +"')");
         }
-
+        
 
         if (logger.isDebugEnabled()) {
-            logger.debug("[THYMELEAF][{}] Rendering Thymeleaf Tiles attribute \"{}\"", new Object[] {TemplateEngine.threadIndex(), value});
+            logger.debug("[THYMELEAF][{}] Rendering Thymeleaf Tiles attribute with value \"{}\"", new Object[] {TemplateEngine.threadIndex(), value});
         }
         
         
@@ -109,11 +110,13 @@ public class ThymeleafAttributeRenderer
                 (TemplateEngine) request.getAttribute(ThymeleafTilesNaming.TEMPLATE_ENGINE_ATTRIBUTE_NAME);
         final IProcessingContext processingContext = 
                 (IProcessingContext) request.getAttribute(ThymeleafTilesNaming.PROCESSING_CONTEXT_ATTRIBUTE_NAME);
-        
-        // This might not have been set
-        final FragmentBehaviour fragmentBehaviour = 
-                (FragmentBehaviour) request.getAttribute(ThymeleafTilesNaming.FRAGMENT_BEHAVIOUR_ATTRIBUTE_NAME);
-        
+
+        // This one could be null!
+        final FragmentMetadata fragmentBehaviour =
+                (FragmentMetadata) request.getAttribute(ThymeleafTilesNaming.FRAGMENT_METADATA_ATTRIBUTE_NAME);
+        // Once retrieved, we have to remove it in order to avoid it affecting other templates
+        request.removeAttribute(ThymeleafTilesNaming.FRAGMENT_METADATA_ATTRIBUTE_NAME);
+                
         
         if (tilesRequestContext instanceof JspTilesRequestContext) {
             
@@ -134,16 +137,8 @@ public class ThymeleafAttributeRenderer
             
         }
         
-        boolean displayOnlySelectionChildren = false;
-        if (fragmentBehaviour != null) {
-            final String attributeOrDefinitionName = fragmentBehaviour.getAttributeOrDefinitionName();
-            if (attributeOrDefinitionName.equals(value)) {
-                // Will only apply this fragment behaviour if it was specified for this
-                // specific definition or attribute (this avoids problems in TH->JSP->TH scenarios).
-                displayOnlySelectionChildren = fragmentBehaviour.isDisplayOnlyChildren();
-            }
-            request.removeAttribute(ThymeleafTilesNaming.FRAGMENT_BEHAVIOUR_ATTRIBUTE_NAME);
-        }
+        final boolean displayOnlySelectionChildren =
+                (fragmentBehaviour != null? fragmentBehaviour.isDisplayOnlyChildren() : false);
         
         final FragmentAndTarget fragmentAndTarget = 
                 computeTemplateSelector(templateEngine, processingContext, templateSelector, displayOnlySelectionChildren);
@@ -156,7 +151,7 @@ public class ThymeleafAttributeRenderer
 
 
         if (logger.isDebugEnabled()) {
-            logger.debug("[THYMELEAF][{}] Rendered Thymeleaf Tiles attribute \"{}\"", new Object[] {TemplateEngine.threadIndex(), value});
+            logger.debug("[THYMELEAF][{}] Rendered Thymeleaf Tiles attribute with value \"{}\"", new Object[] {TemplateEngine.threadIndex(), value});
         }
         
         

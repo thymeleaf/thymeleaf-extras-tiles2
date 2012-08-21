@@ -21,13 +21,13 @@ package org.thymeleaf.extras.tiles2.renderer;
 
 import org.thymeleaf.util.Validate;
 
-public class FragmentBehaviour {
+public class FragmentMetadata {
 
     private final String attributeOrDefinitionName;
     private boolean displayOnlyChildren = false;
     
     
-    public FragmentBehaviour(final String attributeOrDefinitionName) {
+    public FragmentMetadata(final String attributeOrDefinitionName) {
         super();
         Validate.notNull(attributeOrDefinitionName, "Attribute/Definition name cannot be null");
         this.attributeOrDefinitionName = attributeOrDefinitionName;

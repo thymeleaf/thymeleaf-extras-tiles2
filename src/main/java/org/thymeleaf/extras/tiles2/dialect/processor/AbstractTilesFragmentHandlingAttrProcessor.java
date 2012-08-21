@@ -33,6 +33,8 @@ import org.apache.tiles.TilesContainer;
 import org.apache.tiles.servlet.context.ServletUtil;
 import org.apache.tiles.template.DefaultAttributeResolver;
 import org.apache.tiles.template.InsertAttributeModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.thymeleaf.Arguments;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.DialectAwareProcessingContext;
@@ -44,7 +46,7 @@ import org.thymeleaf.dom.Macro;
 import org.thymeleaf.dom.Node;
 import org.thymeleaf.exceptions.ConfigurationException;
 import org.thymeleaf.exceptions.TemplateProcessingException;
-import org.thymeleaf.extras.tiles2.renderer.FragmentBehaviour;
+import org.thymeleaf.extras.tiles2.renderer.FragmentMetadata;
 import org.thymeleaf.extras.tiles2.request.LocalVariablesHttpServletRequest;
 import org.thymeleaf.processor.attr.AbstractChildrenModifierAttrProcessor;
 
@@ -57,6 +59,9 @@ import org.thymeleaf.processor.attr.AbstractChildrenModifierAttrProcessor;
  */
 public abstract class AbstractTilesFragmentHandlingAttrProcessor
         extends AbstractChildrenModifierAttrProcessor {
+
+    
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     
     
@@ -82,7 +87,7 @@ public abstract class AbstractTilesFragmentHandlingAttrProcessor
         final String attributeValue = element.getAttributeValue(attributeName);
         
         final boolean replaceHostElement = getReplaceHostElement(arguments, element, attributeName);
-        
+
         final IContext context = arguments.getContext();
         if (!(context instanceof IWebContext)) {
             throw new ConfigurationException(
@@ -140,13 +145,20 @@ public abstract class AbstractTilesFragmentHandlingAttrProcessor
         
         
         /*
-         * Create the fragment behaviour object that will determine whether
+         * Create the fragment metadata object that will determine whether
          * the rendered fragment will include the containing markup element 
          * (substituteby) or not (include).
          */
-        final FragmentBehaviour fragmentBehaviour = new FragmentBehaviour(name);
-        fragmentBehaviour.setDisplayOnlyChildren(!replaceHostElement);
+        final FragmentMetadata fragmentMetadata = new FragmentMetadata(name);
+        fragmentMetadata.setDisplayOnlyChildren(!replaceHostElement);
         
+        
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace("[THYMELEAF][{}][{}] Executing Tiles Model of class {}" +
+            		"for attribute \"{}\" with value \"{}\"",
+                    new Object[] {TemplateEngine.threadIndex(), arguments.getTemplateName(),
+                    this.model.getClass().getName(), attributeName, attributeValue});
+        }
         
         /*
          * Actual execution of the Tiles model. This will end up triggering
@@ -159,13 +171,20 @@ public abstract class AbstractTilesFragmentHandlingAttrProcessor
                     defaultValueType, name, value,
                     templateEngine, processingContext,
                     localVariablesHttpServletRequest, response, writer,
-                    fragmentBehaviour);
+                    fragmentMetadata);
         } catch (final IOException e)  {
             throw new TemplateProcessingException(
                     "Error while processing Tiles attribute \"" + name + "\"", e);
         }
         
         final String templateResult = writer.toString();
+        
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace("[THYMELEAF][{}][{}] Correctly executed Tiles Model of class {}" +
+                    "for attribute \"{}\" with value \"{}\", result is:\n{}",
+                    new Object[] {TemplateEngine.threadIndex(), arguments.getTemplateName(),
+                    this.model.getClass().getName(), attributeName, attributeValue, templateResult});
+        }
         
         final Macro macroNode = new Macro(templateResult);
         

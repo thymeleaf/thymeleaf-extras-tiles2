@@ -39,7 +39,7 @@ import org.thymeleaf.context.DialectAwareProcessingContext;
 import org.thymeleaf.context.IContext;
 import org.thymeleaf.context.IProcessingContext;
 import org.thymeleaf.extras.tiles2.naming.ThymeleafTilesNaming;
-import org.thymeleaf.extras.tiles2.renderer.FragmentBehaviour;
+import org.thymeleaf.extras.tiles2.renderer.FragmentMetadata;
 
 
 
@@ -75,11 +75,8 @@ public class ThymeleafTilesRequestContextFactory
         //   3. HttpServletRequest
         //   4. HttpServletResponse
         //   5. Writer
-        //   6. (optional) A FragmentBehaviour object indicating whether only the children of
-        //      the selected markup fragment (the attribute to be rendered) should
-        //      be displayed. This is used for differentiating between rendering a
-        //      tiles:include (only the children of the fragment are displayed) and 
-        //      a tiles:substituteby (the selected container itself is displayed).
+        //   6. (optional) A FragmentMetadata object containing diverse metadata information
+        //      about the execution of an attribute.
         
         if ((requestItems.length == 5 &&
                 requestItems[0] instanceof TemplateEngine &&
@@ -94,7 +91,7 @@ public class ThymeleafTilesRequestContextFactory
                 requestItems[2] instanceof HttpServletRequest &&
                 requestItems[3] instanceof HttpServletResponse &&
                 requestItems[4] instanceof Writer &&
-                requestItems[5] instanceof FragmentBehaviour)) {
+                requestItems[5] instanceof FragmentMetadata)) {
 
             
             
@@ -103,8 +100,8 @@ public class ThymeleafTilesRequestContextFactory
             final HttpServletRequest request = (HttpServletRequest) requestItems[2];
             final HttpServletResponse response = (HttpServletResponse) requestItems[3];
             final Writer writer = (Writer) requestItems[4];
-            final FragmentBehaviour fragmentBehaviour =
-                    (requestItems.length == 6? (FragmentBehaviour) requestItems[5]  : null);
+            final FragmentMetadata fragmentMetadata =
+                    (requestItems.length == 6? (FragmentMetadata) requestItems[5]  : null);
             
             final IProcessingContext processingContext =
                     (contextObject instanceof IProcessingContext?
@@ -114,19 +111,14 @@ public class ThymeleafTilesRequestContextFactory
                                     templateEngine.getConfiguration().getDialects().values()));
             
             /*
-             * Add TemplateEngine, ProcessingContext and the "displayOnlyChildren" flag as attributes 
+             * Add TemplateEngine, ProcessingContext and FragmentMetadata as attributes 
              * to the request, so that the ThymeleafAttributeRenderer can retrieve them.
-             * 
-             * Note that the "displayOnlyChildren" flag only has validity at the attribute being
-             * immediately rendered and not at any attributes deeper in the Tiles hierarchy. But this
-             * will be OK because every tiles:include/tiles:substituteby processor will specify a
-             * new value for it. In JSPs, this attribute will be of no effect.
              */
             
             request.setAttribute(ThymeleafTilesNaming.TEMPLATE_ENGINE_ATTRIBUTE_NAME, templateEngine);
             request.setAttribute(ThymeleafTilesNaming.PROCESSING_CONTEXT_ATTRIBUTE_NAME, processingContext);
-            if (fragmentBehaviour != null) {
-                request.setAttribute(ThymeleafTilesNaming.FRAGMENT_BEHAVIOUR_ATTRIBUTE_NAME, fragmentBehaviour);
+            if (fragmentMetadata != null) {
+                request.setAttribute(ThymeleafTilesNaming.FRAGMENT_METADATA_ATTRIBUTE_NAME, fragmentMetadata);
             }
 
             

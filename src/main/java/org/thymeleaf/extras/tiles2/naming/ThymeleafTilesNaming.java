@@ -32,7 +32,7 @@ public final class ThymeleafTilesNaming {
     
     public static final String TEMPLATE_ENGINE_ATTRIBUTE_NAME = "%%THYMELEAF_TEMPLATE_ENGINE%%";
     public static final String PROCESSING_CONTEXT_ATTRIBUTE_NAME = "%%THYMELEAF_PROCESSING_CONTEXT%%";
-    public static final String FRAGMENT_BEHAVIOUR_ATTRIBUTE_NAME = "%%THYMELEAF_FRAGMENT_BEHAVIOUR%%";
+    public static final String FRAGMENT_METADATA_ATTRIBUTE_NAME = "%%THYMELEAF_FRAGMENT_METADATA%%";
     
     
     private ThymeleafTilesNaming() {

@@ -29,11 +29,13 @@ import org.apache.tiles.evaluator.AttributeEvaluatorFactory;
 import org.apache.tiles.factory.BasicTilesContainerFactory;
 import org.apache.tiles.renderer.AttributeRenderer;
 import org.apache.tiles.renderer.TypeDetectingAttributeRenderer;
+import org.apache.tiles.renderer.impl.AbstractTypeDetectingAttributeRenderer;
 import org.apache.tiles.renderer.impl.BasicRendererFactory;
 import org.apache.tiles.renderer.impl.ChainedDelegateAttributeRenderer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.thymeleaf.extras.tiles2.context.ThymeleafTilesRequestContextFactory;
+import org.thymeleaf.extras.tiles2.renderer.MetadataCleaningAttributeRendererWrapper;
 import org.thymeleaf.extras.tiles2.renderer.ThymeleafAttributeRenderer;
 
 
@@ -87,6 +89,20 @@ public class ThymeleafTilesContainerFactory extends BasicTilesContainerFactory {
         rendererFactory.registerRenderer(
                 JSP_RENDERER_NAME, 
                 rendererFactory.getRenderer(TEMPLATE_RENDERER_NAME));
+
+        /*
+         * Wrap existing attribute renderers (all except the DEFINITION one, 
+         * because it merely acts as a wrapper for the ones that really render
+         * templates (JSP, STRING and THYMELEAF).
+         */
+        rendererFactory.registerRenderer(
+                JSP_RENDERER_NAME, 
+                new MetadataCleaningAttributeRendererWrapper(
+                        (AbstractTypeDetectingAttributeRenderer)rendererFactory.getRenderer(JSP_RENDERER_NAME)));
+        rendererFactory.registerRenderer(
+                STRING_RENDERER_NAME, 
+                new MetadataCleaningAttributeRendererWrapper(
+                        (AbstractTypeDetectingAttributeRenderer)rendererFactory.getRenderer(STRING_RENDERER_NAME)));
         
         
         /*
@@ -94,9 +110,11 @@ public class ThymeleafTilesContainerFactory extends BasicTilesContainerFactory {
          * and as general template renderer (no 'type' attribute specified)
          */
         final AttributeRenderer thymeleafAttributeRenderer = 
-                createThymeleafAttributeRenderer(rendererFactory,
-                        applicationContext, contextFactory, container,
-                        attributeEvaluatorFactory);
+                new MetadataCleaningAttributeRendererWrapper(
+                    (AbstractTypeDetectingAttributeRenderer)
+                        createThymeleafAttributeRenderer(rendererFactory,
+                                applicationContext, contextFactory, container,
+                                attributeEvaluatorFactory));
                         
         rendererFactory.registerRenderer(THYMELEAF_RENDERER_NAME, thymeleafAttributeRenderer);
         rendererFactory.registerRenderer(TEMPLATE_RENDERER_NAME, thymeleafAttributeRenderer);
