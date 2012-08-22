@@ -77,9 +77,11 @@ public class MetadataCleaningAttributeRendererWrapper
         final Object value = attribute.getValue();
 
         if (logger.isTraceEnabled()) {
+            final Long threadIndexLong = TemplateEngine.threadIndex();
+            final String threadIndex = 
+                    (threadIndexLong == null ? "-" : threadIndexLong.toString());
             logger.trace("[THYMELEAF][{}] Executing wrapped renderer of class {} for attribute with " +
-                    "value \"{}\"", new Object[] {TemplateEngine.threadIndex(), 
-                    this.renderer.getClass().getName(), value});
+                    "value \"{}\"", new Object[] {threadIndex, this.renderer.getClass().getName(), value});
         }
 
         
@@ -105,9 +107,12 @@ public class MetadataCleaningAttributeRendererWrapper
             // a null-valued one. So we just execute the renderer.
 
             if (logger.isTraceEnabled()) {
+                final Long threadIndexLong = TemplateEngine.threadIndex();
+                final String threadIndex = 
+                        (threadIndexLong == null ? "-" : threadIndexLong.toString());
                 logger.trace("[THYMELEAF][{}] No Fragment Behaviour object has been found in request. " +
                         "Normal execution will be triggered for attribute with value \"{}\"", 
-                        new Object[] {TemplateEngine.threadIndex(), value});
+                        new Object[] {threadIndex, value});
             }
         
             this.renderer.render(attribute, tilesRequestContext);
@@ -125,11 +130,14 @@ public class MetadataCleaningAttributeRendererWrapper
                 // end up affecting the way TH2 is rendered.
 
                 if (logger.isTraceEnabled()) {
+                    final Long threadIndexLong = TemplateEngine.threadIndex();
+                    final String threadIndex = 
+                            (threadIndexLong == null ? "-" : threadIndexLong.toString());
                     logger.trace("[THYMELEAF][{}] A Fragment Behaviour object has been found in request, " +
                             "and renderer is of class {}, which is not a Thymeleaf renderer. " +
-                            "Fragment Behaviour object will be removed from request before rendering" +
+                            "Fragment Behaviour object will be removed from request before rendering " +
                             "attribute with value \"{}\"", 
-                            new Object[] {TemplateEngine.threadIndex(), this.renderer.getClass().getName(), value});
+                            new Object[] {threadIndex, this.renderer.getClass().getName(), value});
                 }
                 
                 request.removeAttribute(ThymeleafTilesNaming.FRAGMENT_METADATA_ATTRIBUTE_NAME);
@@ -137,10 +145,13 @@ public class MetadataCleaningAttributeRendererWrapper
             } else {
 
                 if (logger.isTraceEnabled()) {
+                    final Long threadIndexLong = TemplateEngine.threadIndex();
+                    final String threadIndex = 
+                            (threadIndexLong == null ? "-" : threadIndexLong.toString());
                     logger.trace("[THYMELEAF][{}] A Fragment Behaviour object has been found in request, " +
                             "and renderer is of class {}, which is a Thymeleaf renderer. " +
                             "Fragment Behaviour will be used when rendering attribute with value \"{}\"", 
-                            new Object[] {TemplateEngine.threadIndex(), this.renderer.getClass().getName(), value});
+                            new Object[] {threadIndex, this.renderer.getClass().getName(), value});
                 }
                 
             }
@@ -159,9 +170,11 @@ public class MetadataCleaningAttributeRendererWrapper
         
         
         if (logger.isTraceEnabled()) {
+            final Long threadIndexLong = TemplateEngine.threadIndex();
+            final String threadIndex = 
+                    (threadIndexLong == null ? "-" : threadIndexLong.toString());
             logger.trace("[THYMELEAF][{}] Finished execution of wrapped renderer of class {} for attribute with " +
-                    "value \"{}\"", new Object[] {TemplateEngine.threadIndex(), 
-                    this.renderer.getClass().getName(), value});
+                    "value \"{}\"", new Object[] {threadIndex, this.renderer.getClass().getName(), value});
         }
         
     }
