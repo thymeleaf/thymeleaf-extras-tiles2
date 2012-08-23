@@ -40,6 +40,8 @@ Features
 --------
 
   *   *(Optional)* **Spring MVC 3** integration
+  *   *(Optional)* **Spring Web Flow 2.3** integration, with AJAX fragment 
+      rendering support.
   *   Use Thymeleaf in your **Tiles definitions**:
     *   Use Thymeleaf templates.
     *   Include Thymeleaf templates (or fragments of templates) as attributes.
@@ -73,7 +75,7 @@ Configuration with Spring
 -------------------------
 
 In order to use Apache Tiles 2 with Thymeleaf in your Spring MVC application,
-you will first need to configure your application in the usual way for
+we will first need to configure our application in the usual way for
 Spring + Thymeleaf applications (*TemplateEngine* bean, *template resolvers*, 
 etc.), and then create an instance of the `ThymeleafTilesConfigurer` (similar
 to the Spring Tiles configurer for JSP), like:
@@ -88,7 +90,7 @@ to the Spring Tiles configurer for JSP), like:
     </bean>
 ```
 
-Also, you will need to configure your Thymeleaf *view resolver* in order to
+Also, we will need to configure our Thymeleaf *view resolver* in order to
 use a specialized Thymeleaf-Tiles2 view class:
 
 ```xml
@@ -98,7 +100,7 @@ use a specialized Thymeleaf-Tiles2 view class:
     </bean>
 ```
 
-...and finally, add the Tiles dialect to your Template Engine so that you
+...and finally, add the Tiles dialect to our Template Engine so that we
 can use the `tiles:*` attributes:
 
 ```xml
@@ -113,29 +115,30 @@ can use the `tiles:*` attributes:
     </bean>
 ```
 
-And that's all! Now you can make your controller methods return Tiles 
+And that's all! Now we can make our controller methods return Tiles 
 definition names as view names and everything should work fine.
+
 
 
 Configuration and usage without Spring
 --------------------------------------
 
 Following the standard configuration mechanisms in Tiles 2.2, in order to 
-use Thymeleaf + Tiles in a non-Spring application, you should:
+use Thymeleaf + Tiles in a non-Spring application, we should:
 
   *   Either configure an `org.thymeleaf.extras.tiles2.web.startup.ThymeleafTilesListener`
-      at your `web.xml`
+      at our `web.xml`
   *   ...or configure an `org.thymeleaf.extras.tiles2.web.startup.ThymeleafTilesServlet`,
-      also at your `web.xml`.
+      also at our `web.xml`.
 
-Both of these artifacts declare and initialize a Thymeleaf-enabled 
-`TilesContainer` instance, which you can access with:
+Both these artifacts declare and initialize a Thymeleaf-enabled 
+`TilesContainer` instance, which we can access with:
 
 ```java
     final TilesContainer tiles = ServletUtil.getContainer(servletContext);
 ```
     
-...and then execute specifying the definition to be executed and the 
+...and then execute, specifying the definition to be executed and the 
 following sequence of *request items*:
 
   1.   The Thymeleaf *template engine* (`TemplateEngine`)
@@ -152,16 +155,16 @@ Put as code:
 ```
   
   
-Using Thymeleaf in your definition files
-----------------------------------------
+Using Thymeleaf in our definition files
+---------------------------------------
 
-Using Thymeleaf in your definition files (usually called something like
+Using Thymeleaf in our definition files (usually called something like
 `tiles-defs.xml`) is easy. These are the key points:
   
   *   Thymeleaf is now the default *template type*, instead of JSP.
-    *   You can use `type="thymeleaf"` or simply omit `type`, for both your
+    *   We can use `type="thymeleaf"` or simply omit `type`, for both our
         templates and attributes.
-	*   You can use `type="jsp"` for your JSP templates and attributes.
+	*   We can use `type="jsp"` for our JSP templates and attributes.
   *   Thymeleaf value syntax is equivalent to that of  `th:include` and
       `th:substituteby` attributes:
 	  `"TEMPLATESELECTOR (:: FRAGMENTSELECTOR)?"`
@@ -198,8 +201,8 @@ A quick example:
 Inserting attributes
 --------------------
 
-The new `tiles` dialect allows you to insert Tiles attributes easily,
-just as you'd do with `th:include`:
+The new `tiles` dialect allows us to insert Tiles attributes easily,
+just as we'd do with `th:include`:
 
 ```xml
     <html xmlns:th="http://www.thymeleaf.org" xmlns:tiles="http://www.thymeleaf.org">
@@ -236,8 +239,8 @@ What about inserting *string* attributes? Easy:
     <span tiles:string="some_string_attribute">blah blah</span>
 ```
 
-And there's one more attribute, which allows you to (optionally) specify 
-which parts of your template you will be using as a fragment. So:
+And there's one more attribute, which allows us to (optionally) specify 
+which part of our template we will be using as a fragment. So:
 
 ```xml
     <div tiles:fragment="text">
@@ -245,7 +248,7 @@ which parts of your template you will be using as a fragment. So:
 	</div>
 ```
 
-...will specify a fragment you can use in your definitions with:
+...will specify a fragment we can use in our definitions with:
   
 ```xml
     <put-attribute name="text" value="main :: text" />
@@ -256,9 +259,11 @@ Mixing Thymeleaf and JSP
 ------------------------
 
 For a better legacy integration and a smoother migration of applications,
-Thymeleaf templates and JSPs can be mixed together in Tiles definitions,
-and they can even *communicate*, so that they can see the variables
-that the other define:
+Thymeleaf templates and JSPs can be mixed together in Tiles definitions, so
+that Thymeleaf templates can include JSP attributes, and viceversa.
+
+And these fragments in different technologies can even *communicate*, so 
+that they can see the variables that the others define:
 
   *   Thymeleaf attribute included into Thymeleaf template:
     *   Attribute can see all local variables (e.g. `th:with`) defined in 
@@ -271,6 +276,124 @@ that the other define:
         templates as *request attributes*.
     
     
-  
 
   
+Using Spring Web Flow
+---------------------
+
+In order to use Thymeleaf + Tiles in our Spring Web Flow applications, we
+will first need to modify the definition of our *View Resolver*, so that it
+uses thymeleaf's AJAX-enabled implementation configured to create *View*
+instances that understand the SpringWebFlow-Tiles combination:
+  
+
+```xml
+    <bean id="tilesViewResolver" class="org.thymeleaf.spring3.view.AjaxThymeleafViewResolver">
+      <property name="viewClass" value="org.thymeleaf.extras.tiles2.spring.web.view.FlowAjaxThymeleafTilesView"/>
+      <property name="templateEngine" ref="templateEngine" />
+    </bean>
+```
+
+
+### Scenario
+
+
+Let's say we have a Tiles definition like:
+
+```xml
+    ...
+    <definition name="order_details" template="orderdet">
+      <put-attribute name="prog_content" value="progress :: progtext" />
+    </definition>
+	...
+```
+
+Which references a *template file* called `orderdet`, which will probably be added
+a prefix and a suffix by the Thymeleaf *template resolver*, resulting into something
+like `/WEB-INF/templates/orderdet.html`. 
+
+Also, we can see how `orderdet` includes a fragment (an *attribute* in Tiles jargon)
+called `prog_content`, which resolves to a fragment (specified with `tiles:fragment`)
+called `progtext` in template `progress` (probably `/WEB-INF/templates/progress.html`).
+
+Let's see how these two template files could look like. First, the relevant parts
+of `orderdet.html`:
+
+```html
+    <!DOCTYPE html>
+
+    <html xmlns:th="http://www.thymeleaf.org" xmlns:tiles="http://www.thymeleaf.org">
+    
+      <head>
+        ...
+        <script type="text/javascript" th:src="@{/resources/dojo/dojo.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/spring/Spring.js}"></script>
+        <script type="text/javascript" th:src="@{/resources/spring/Spring-Dojo.js}"></script>
+      </head>
+    
+      <body>
+    
+        ...
+        ...
+    
+        <div tiles:substituteby="prog_content">
+    	  Progress of your order: GOOD!
+    	</div>
+    	
+        <form id="progressForm" method="post">
+          <input type="submit" id="progressButton" name="_eventId_checkprogress" value="Update order progress!" />
+        </form>
+    
+    
+        <script type="text/javascript">
+            Spring.addDecoration(
+                    new Spring.AjaxEventDecoration(
+                            {
+                             elementId:'progressButton',
+                             event:'onclick',
+                             formId:'progressForm'
+                            }));
+        </script>
+    
+      </body>
+      
+    </html>
+```
+
+
+There you can see how we added the required JavaScript libraries from the Spring JS project
+(a part of Spring Web Flow), and then linked an AJAX call for Spring Web Flow's
+event `checkprogress` to our form button.
+
+The relevant parts of our `progress.html` file could look like:   
+
+
+```html
+    ...
+    <div id="progressText" tiles:fragment="progtext">
+      Progress of your order <span th:text="${order.percentComplete}">34</span>%
+    </div>
+	...
+```
+
+Note that, in order for Spring Web Flow to be able to refresh a markup fragment via AJAX, 
+the specific fragment must be completely enclosed in an element specifying an `id` attribute, 
+like the `<div id="progressText" ...>` you see above. Also note that in order to preserve 
+that `id` when it renders, we use `tiles:substituteby` instead of `tiles:include`.
+
+
+Our flow can now define a transition for updating that fragment as a part of 
+the *Order Details* view (`view-state`): 
+
+```xml
+    <view-state id="orderdetailsview" view="orderdet">
+        <transition on="checkprogress">
+          <render fragments="prog_content"/>
+        </transition>
+    </view-state>
+```
+
+Your AJAX interactions should now work seamlessly.
+
+
+
