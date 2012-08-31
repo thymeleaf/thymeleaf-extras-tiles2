@@ -162,9 +162,10 @@ Using Thymeleaf in our definition files (usually called something like
 `tiles-defs.xml`) is easy. These are the key points:
   
   *   Thymeleaf is now the default *template type*, instead of JSP.
-    *   We can use `type="thymeleaf"` or simply omit `type`, for both our
-        templates and attributes.
-	*   We can use `type="jsp"` for our JSP templates and attributes.
+    *   We can use `templateType="thymeleaf"` or simply omit `teamplateType`
+        for our templates, and `type="thymeleaf"` for attributes.
+	*   We can use `templateType="jsp"` for our JSP templates
+	    (`type="jsp"` for our attributes).
   *   Thymeleaf value syntax is equivalent to that of  `th:include` and
       `th:substituteby` attributes:
 	  `"TEMPLATESELECTOR (:: FRAGMENTSELECTOR)?"`
