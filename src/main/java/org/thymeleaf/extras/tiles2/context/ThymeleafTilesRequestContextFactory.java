@@ -139,8 +139,8 @@ public class ThymeleafTilesRequestContextFactory
                             new ServletTilesRequestContext(tilesApplicationContext, request, responseWithWriter));
 
             if (logger.isTraceEnabled()) {
-                logger.trace("[THYMELEAF][{}] Processed Thymeleaf Tiles Request Context. " +
-                        "Created instance of {}", new Object[] {TemplateEngine.threadIndex(), (result != null? result.getClass().getName() : null)});
+                logger.trace("[THYMELEAF][TILES] Processed Thymeleaf Tiles Request Context. " +
+                        "Created instance of {}", new Object[] {(result != null? result.getClass().getName() : null)});
             }
             
             return result;

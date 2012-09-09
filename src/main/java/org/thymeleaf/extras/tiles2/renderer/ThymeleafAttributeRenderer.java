@@ -94,7 +94,7 @@ public class ThymeleafAttributeRenderer
         
 
         if (logger.isDebugEnabled()) {
-            logger.debug("[THYMELEAF][{}] Rendering Thymeleaf Tiles attribute with value \"{}\"", new Object[] {TemplateEngine.threadIndex(), value});
+            logger.debug("[THYMELEAF][TILES] Rendering Thymeleaf Tiles attribute with value \"{}\"", new Object[] {value});
         }
         
         
@@ -125,10 +125,9 @@ public class ThymeleafAttributeRenderer
             // instead of directly writing to the response.getWriter() we will be writing.
 
             if (logger.isTraceEnabled()) {
-                logger.trace("[THYMELEAF][{}] Current Tiles Request Context is a JSP" +
+                logger.trace("[THYMELEAF][TILES] Current Tiles Request Context is a JSP" +
                 		"context. Flushing JspWriter to avoid fragment writing order " +
-                		"problems.", 
-                        new Object[] {TemplateEngine.threadIndex()});
+                		"problems.");
             }
             
             final JspTilesRequestContext jspTilesRequestContext = (JspTilesRequestContext) tilesRequestContext;
@@ -151,7 +150,7 @@ public class ThymeleafAttributeRenderer
 
 
         if (logger.isDebugEnabled()) {
-            logger.debug("[THYMELEAF][{}] Rendered Thymeleaf Tiles attribute with value \"{}\"", new Object[] {TemplateEngine.threadIndex(), value});
+            logger.debug("[THYMELEAF][TILES] Rendered Thymeleaf Tiles attribute with value \"{}\"", new Object[] {value});
         }
         
         
