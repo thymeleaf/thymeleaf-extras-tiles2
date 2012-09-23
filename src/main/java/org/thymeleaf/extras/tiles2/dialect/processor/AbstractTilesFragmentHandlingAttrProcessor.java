@@ -135,12 +135,13 @@ public abstract class AbstractTilesFragmentHandlingAttrProcessor
         final Attribute value = null;
         
         
+
+        final TemplateEngine templateEngine = arguments.getTemplateEngine();
+        
         /*
-         * Template engine is bound to the thread (as a thread local).
          * We use a StringWriter in order to avoid anyone writing directly to the
          * response writer (something that would mess our fragments).
          */
-        final TemplateEngine templateEngine = TemplateEngine.threadTemplateEngine();
         final StringWriter writer = new StringWriter();
         
         

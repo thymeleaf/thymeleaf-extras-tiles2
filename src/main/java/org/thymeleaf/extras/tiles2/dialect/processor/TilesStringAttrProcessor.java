@@ -111,7 +111,7 @@ public class TilesStringAttrProcessor
         final String name = attributeValue;
         final Attribute value = null;
         
-        final TemplateEngine templateEngine = TemplateEngine.threadTemplateEngine();
+        final TemplateEngine templateEngine = arguments.getTemplateEngine();
         final StringWriter writer = new StringWriter();
         
         try {
