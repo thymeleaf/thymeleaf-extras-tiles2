@@ -86,7 +86,7 @@
 
   <properties>
     <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
-    <thymeleaf.version>2.0.14-SNAPSHOT</thymeleaf.version>
+    <thymeleaf.version>2.0.15-SNAPSHOT</thymeleaf.version>
     <springframework.version>3.0.7.RELEASE</springframework.version>
     <springwebflow.version>2.3.1.RELEASE</springwebflow.version>
     <tiles.version>2.2.2</tiles.version>
@@ -228,13 +228,13 @@
     <dependency>
       <groupId>org.thymeleaf</groupId>
       <artifactId>thymeleaf</artifactId>
-      <version>2.0.15-SNAPSHOT</version>
+      <version>${thymeleaf.version}</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.thymeleaf</groupId>
       <artifactId>thymeleaf-spring3</artifactId>
-      <version>2.0.15-SNAPSHOT</version>
+      <version>${thymeleaf.version}</version>
       <scope>compile</scope>
       <optional>true</optional>
     </dependency>

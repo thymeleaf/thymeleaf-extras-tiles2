@@ -11,7 +11,7 @@ This is a *thymeleaf extras* module, not a part of the Thymeleaf core (and as
 such following its own versioning schema), but fully supported by the 
 Thymeleaf team.
 
-Current version: **1.0.0-beta2**
+Current version: **1.0.0-beta3**
 
 
 License
@@ -24,7 +24,7 @@ This software is licensed under the [Apache License 2.0]
 Requirements
 ------------
 
-  *   Thymeleaf **2.0.12+**
+  *   Thymeleaf **2.0.14+**
   *   Apache Tiles 2 version **2.2.1+** (**2.2.2** recommended)
   *   Web environment (Tiles integration cannot work offline)
 
