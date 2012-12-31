@@ -24,7 +24,7 @@
   <groupId>org.thymeleaf.extras</groupId>
   <artifactId>thymeleaf-extras-tiles2</artifactId>
   <packaging>jar</packaging>
-  <version>2.0.0</version>
+  <version>2.0.1-SNAPSHOT</version>
   <name>thymeleaf-extras-tiles2</name>
   <url>http://www.thymeleaf.org</url>
 
