@@ -38,6 +38,12 @@ Maven info
   *   artifactId: `thymeleaf-extras-tiles2`
 
 
+Distribution packages
+---------------------
+
+Distribution packages (binaries + sources + javadoc) can be downloaded from [SourceForge](http://sourceforge.net/projects/thymeleaf/files/thymeleaf-extras-tiles2/).
+
+
 Features
 --------
 
