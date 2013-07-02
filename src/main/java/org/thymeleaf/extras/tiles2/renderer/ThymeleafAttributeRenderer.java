@@ -214,7 +214,9 @@ public class ThymeleafAttributeRenderer
      */
     private static FragmentAndTarget computeNonStandardFragment(
             final TemplateEngine templateEngine, final String templateSelector) {
-        
+
+        // Note template names in Tiles2 cannot be null (no way of executing the fragment on the "current" template)
+
         final int separatorPos = templateSelector.indexOf("::");
         
         if (separatorPos < 0) {
