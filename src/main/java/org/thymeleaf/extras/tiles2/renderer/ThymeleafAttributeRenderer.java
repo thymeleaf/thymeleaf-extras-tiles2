@@ -44,8 +44,8 @@ import org.thymeleaf.extras.tiles2.dialect.TilesDialect;
 import org.thymeleaf.extras.tiles2.dialect.processor.TilesFragmentAttrProcessor;
 import org.thymeleaf.extras.tiles2.naming.ThymeleafTilesNaming;
 import org.thymeleaf.fragment.DOMSelectorFragmentSpec;
-import org.thymeleaf.fragment.ElementAndAttributeNameFragmentSpec;
 import org.thymeleaf.fragment.FragmentAndTarget;
+import org.thymeleaf.fragment.FragmentSignatureAttributeFragmentSpec;
 import org.thymeleaf.fragment.IFragmentSpec;
 import org.thymeleaf.fragment.WholeFragmentSpec;
 import org.thymeleaf.standard.StandardDialect;
@@ -232,7 +232,7 @@ public class ThymeleafAttributeRenderer
         }
         
         return new FragmentAndTarget(templateName, 
-                new ElementAndAttributeNameFragmentSpec(null, getFragmentAttributeName(templateEngine), fragmentSelector));
+                new FragmentSignatureAttributeFragmentSpec(getFragmentAttributeName(templateEngine), fragmentSelector));
         
     }
     
