@@ -39,18 +39,22 @@ import org.thymeleaf.Configuration;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.IProcessingContext;
 import org.thymeleaf.dialect.IDialect;
+import org.thymeleaf.dom.DOMSelector;
 import org.thymeleaf.exceptions.ConfigurationException;
+import org.thymeleaf.exceptions.TemplateProcessingException;
 import org.thymeleaf.extras.tiles2.dialect.TilesDialect;
 import org.thymeleaf.extras.tiles2.dialect.processor.TilesFragmentAttrProcessor;
 import org.thymeleaf.extras.tiles2.naming.ThymeleafTilesNaming;
 import org.thymeleaf.fragment.DOMSelectorFragmentSpec;
-import org.thymeleaf.fragment.FragmentAndTarget;
-import org.thymeleaf.fragment.FragmentSignatureAttributeFragmentSpec;
 import org.thymeleaf.fragment.IFragmentSpec;
 import org.thymeleaf.fragment.WholeFragmentSpec;
 import org.thymeleaf.standard.StandardDialect;
+import org.thymeleaf.standard.expression.Expression;
+import org.thymeleaf.standard.expression.FragmentSelection;
+import org.thymeleaf.standard.expression.StandardExpressionProcessor;
+import org.thymeleaf.standard.fragment.StandardFragment;
 import org.thymeleaf.standard.fragment.StandardFragmentProcessor;
-
+import org.thymeleaf.util.Validate;
 
 
 /**
@@ -101,7 +105,7 @@ public class ThymeleafAttributeRenderer
         final ServletTilesRequestContext requestContext = 
                 ServletUtil.getServletRequest(tilesRequestContext);
         
-        final String templateSelector = (String) value;
+        final String templateSelector = ((String) value).trim();
 
         final HttpServletRequest request = requestContext.getRequest();
         final HttpServletResponse response = requestContext.getResponse();
@@ -139,13 +143,16 @@ public class ThymeleafAttributeRenderer
         final boolean displayOnlySelectionChildren =
                 (fragmentBehaviour != null? fragmentBehaviour.isDisplayOnlyChildren() : false);
         
-        final FragmentAndTarget fragmentAndTarget = 
-                computeTemplateSelector(templateEngine, processingContext, templateSelector, displayOnlySelectionChildren);
+        final TilesFragment fragment =
+                computeTemplateSelector(templateEngine, processingContext, templateSelector);
 
-        final String templateName = fragmentAndTarget.getTemplateName();
-        final IFragmentSpec fragmentSpec = fragmentAndTarget.getFragmentSpec();
+        final String templateName = fragment.getTemplateName();
+        IFragmentSpec fragmentSpec = fragment.getFragmentSpec();
 
-        
+        if (displayOnlySelectionChildren) {
+            fragmentSpec = new FragmentSpecRootRemovingWrapper(fragmentSpec);
+        }
+
         templateEngine.process(templateName, processingContext, fragmentSpec, response.getWriter());
 
 
@@ -157,10 +164,9 @@ public class ThymeleafAttributeRenderer
     }
     
     
-    
-    private static FragmentAndTarget computeTemplateSelector(final TemplateEngine templateEngine, 
-            final IProcessingContext processingContext, final String templateSelector,
-            final boolean displayOnlySelectionChildren) {
+
+    private static TilesFragment computeTemplateSelector(final TemplateEngine templateEngine,
+            final IProcessingContext processingContext, final String templateSelector) {
 
         if (!templateEngine.isInitialized()) { 
             templateEngine.initialize();
@@ -171,9 +177,16 @@ public class ThymeleafAttributeRenderer
         }
         
         final Configuration configuration = templateEngine.getConfiguration();
-        
-        return StandardFragmentProcessor.computeStandardFragmentSpec(configuration, processingContext, 
-                templateSelector, null, getFragmentAttributeName(templateEngine), displayOnlySelectionChildren);
+
+        final DOMSelector.INodeReferenceChecker nodeReferenceChecker =
+                new TilesFragmentSignatureNodeReferenceChecker(
+                        templateEngine.getConfiguration(), getFragmentAttributeName(templateEngine));
+
+        final StandardFragment standardFragment =
+                StandardFragmentProcessor.computeStandardFragmentSpec(configuration, processingContext,
+                    templateSelector, nodeReferenceChecker);
+
+        return new TilesFragment(standardFragment);
         
     }
 
@@ -212,30 +225,46 @@ public class ThymeleafAttributeRenderer
      *     TEMPLATE_NAME :: FRAGMENT_NAME
      *     TEMPLATE_NAME :: [DOM_SELECTOR]
      */
-    private static FragmentAndTarget computeNonStandardFragment(
+    private static TilesFragment computeNonStandardFragment(
             final TemplateEngine templateEngine, final String templateSelector) {
 
         // Note template names in Tiles2 cannot be null (no way of executing the fragment on the "current" template)
 
+        if (templateSelector.trim().endsWith(")")) {
+            // It seems that parameters have been specified, which is forbidden if the Standard Dialect is not enabled.
+            throw new TemplateProcessingException(
+                    "Cannot process template selector \"" + templateSelector + "\": The Thymeleaf Standard Dialect " +
+                    "has not been enabled, and therefore no parameters can be allowed for fragments.");
+        }
+
         final int separatorPos = templateSelector.indexOf("::");
         
         if (separatorPos < 0) {
-            return new FragmentAndTarget(templateSelector, WholeFragmentSpec.INSTANCE);
+            return new TilesFragment(templateSelector, WholeFragmentSpec.INSTANCE);
         }
         
         final String templateName = templateSelector.substring(0, separatorPos).trim();
-        final String fragmentSelector = templateSelector.substring(separatorPos + 2).trim();
-        
-        if (fragmentSelector.length() > 2 && fragmentSelector.startsWith("[") && fragmentSelector.endsWith("]")) {
-            final String domSelector = fragmentSelector.substring(1, fragmentSelector.length() - 1);
-            return new FragmentAndTarget(templateName, new DOMSelectorFragmentSpec(domSelector));
+        String fragmentSelector = templateSelector.substring(separatorPos + 2).trim();
+
+        if (fragmentSelector.length() > 3 &&
+                fragmentSelector.charAt(0) == '[' && fragmentSelector.charAt(fragmentSelector.length() - 1) == ']' &&
+                fragmentSelector.charAt(fragmentSelector.length() - 2) != '\'') {
+            // For legacy compatibility reasons, we allow fragment DOM Selector expressions to be specified
+            // between brackets. Just remove them.
+            fragmentSelector = fragmentSelector.substring(1, fragmentSelector.length() - 1);
         }
-        
-        return new FragmentAndTarget(templateName, 
-                new FragmentSignatureAttributeFragmentSpec(getFragmentAttributeName(templateEngine), fragmentSelector));
-        
+
+        final DOMSelector.INodeReferenceChecker nodeReferenceChecker =
+                new TilesFragmentSignatureNodeReferenceChecker(
+                        templateEngine.getConfiguration(), getFragmentAttributeName(templateEngine));
+
+        final IFragmentSpec fragmentSpec = new DOMSelectorFragmentSpec(fragmentSelector, nodeReferenceChecker);
+
+        return new TilesFragment(templateName, fragmentSpec);
+
     }
-    
+
+
     
     
     private static String getTilesDialectPrefix(final TemplateEngine templateEngine) {
