@@ -40,6 +40,7 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.IProcessingContext;
 import org.thymeleaf.dialect.IDialect;
 import org.thymeleaf.dom.DOMSelector;
+import org.thymeleaf.dom.Node;
 import org.thymeleaf.exceptions.ConfigurationException;
 import org.thymeleaf.exceptions.TemplateProcessingException;
 import org.thymeleaf.extras.tiles2.dialect.TilesDialect;
@@ -285,7 +286,8 @@ public class ThymeleafAttributeRenderer
     
     private static String getFragmentAttributeName(final TemplateEngine templateEngine) {
         // In most cases: "tiles:fragment"
-        return getTilesDialectPrefix(templateEngine) + ":" + TilesFragmentAttrProcessor.ATTR_NAME;
+        final String prefix = getTilesDialectPrefix(templateEngine);
+        return Node.applyDialectPrefix(TilesFragmentAttrProcessor.ATTR_NAME, prefix);
     }
 
 
