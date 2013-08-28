@@ -287,7 +287,7 @@ public class ThymeleafAttributeRenderer
     private static String getFragmentAttributeName(final TemplateEngine templateEngine) {
         // In most cases: "tiles:fragment"
         final String prefix = getTilesDialectPrefix(templateEngine);
-        return Node.applyDialectPrefix(TilesFragmentAttrProcessor.ATTR_NAME, prefix);
+        return org.thymeleaf.dom.Attribute.applyPrefixToAttributeName(TilesFragmentAttrProcessor.ATTR_NAME, prefix);
     }
 
 
