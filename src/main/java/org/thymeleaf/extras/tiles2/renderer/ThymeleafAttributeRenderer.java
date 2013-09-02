@@ -40,7 +40,6 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.IProcessingContext;
 import org.thymeleaf.dialect.IDialect;
 import org.thymeleaf.dom.DOMSelector;
-import org.thymeleaf.dom.Node;
 import org.thymeleaf.exceptions.ConfigurationException;
 import org.thymeleaf.exceptions.TemplateProcessingException;
 import org.thymeleaf.extras.tiles2.dialect.TilesDialect;
@@ -50,12 +49,8 @@ import org.thymeleaf.fragment.DOMSelectorFragmentSpec;
 import org.thymeleaf.fragment.IFragmentSpec;
 import org.thymeleaf.fragment.WholeFragmentSpec;
 import org.thymeleaf.standard.StandardDialect;
-import org.thymeleaf.standard.expression.Expression;
-import org.thymeleaf.standard.expression.FragmentSelection;
-import org.thymeleaf.standard.expression.StandardExpressionProcessor;
 import org.thymeleaf.standard.fragment.StandardFragment;
 import org.thymeleaf.standard.fragment.StandardFragmentProcessor;
-import org.thymeleaf.util.Validate;
 
 
 /**
@@ -179,9 +174,11 @@ public class ThymeleafAttributeRenderer
         
         final Configuration configuration = templateEngine.getConfiguration();
 
+        final String tilesDialectPrefix = getTilesDialectPrefix(templateEngine);
+
         final DOMSelector.INodeReferenceChecker nodeReferenceChecker =
                 new TilesFragmentSignatureNodeReferenceChecker(
-                        templateEngine.getConfiguration(), getFragmentAttributeName(templateEngine));
+                        templateEngine.getConfiguration(), tilesDialectPrefix, TilesFragmentAttrProcessor.ATTR_NAME);
 
         final StandardFragment standardFragment =
                 StandardFragmentProcessor.computeStandardFragmentSpec(configuration, processingContext,
@@ -255,9 +252,11 @@ public class ThymeleafAttributeRenderer
             fragmentSelector = fragmentSelector.substring(1, fragmentSelector.length() - 1);
         }
 
+        final String tilesDialectPrefix = getTilesDialectPrefix(templateEngine);
+
         final DOMSelector.INodeReferenceChecker nodeReferenceChecker =
                 new TilesFragmentSignatureNodeReferenceChecker(
-                        templateEngine.getConfiguration(), getFragmentAttributeName(templateEngine));
+                        templateEngine.getConfiguration(), tilesDialectPrefix, TilesFragmentAttrProcessor.ATTR_NAME);
 
         final IFragmentSpec fragmentSpec = new DOMSelectorFragmentSpec(fragmentSelector, nodeReferenceChecker);
 
@@ -282,14 +281,6 @@ public class ThymeleafAttributeRenderer
                 "the " + TilesDialect.class.getName() + " dialect at your Template Engine");
         
     }
-    
-    
-    private static String getFragmentAttributeName(final TemplateEngine templateEngine) {
-        // In most cases: "tiles:fragment"
-        final String prefix = getTilesDialectPrefix(templateEngine);
-        return org.thymeleaf.dom.Attribute.applyPrefixToAttributeName(TilesFragmentAttrProcessor.ATTR_NAME, prefix);
-    }
-
 
 
 
