@@ -20,20 +20,15 @@
 package org.thymeleaf.extras.tiles2.renderer;
 
 import java.util.List;
-import java.util.Map;
 
-import org.thymeleaf.Arguments;
 import org.thymeleaf.Configuration;
 import org.thymeleaf.Template;
 import org.thymeleaf.TemplateProcessingParameters;
 import org.thymeleaf.TemplateRepository;
 import org.thymeleaf.context.IProcessingContext;
-import org.thymeleaf.dom.NestableAttributeHolderNode;
 import org.thymeleaf.dom.Node;
 import org.thymeleaf.exceptions.TemplateProcessingException;
 import org.thymeleaf.fragment.IFragmentSpec;
-import org.thymeleaf.standard.expression.FragmentSignature;
-import org.thymeleaf.standard.expression.StandardExpressionProcessor;
 import org.thymeleaf.standard.fragment.StandardFragment;
 import org.thymeleaf.util.Validate;
 

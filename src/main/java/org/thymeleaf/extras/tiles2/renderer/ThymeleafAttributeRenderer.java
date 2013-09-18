@@ -51,6 +51,7 @@ import org.thymeleaf.fragment.WholeFragmentSpec;
 import org.thymeleaf.standard.StandardDialect;
 import org.thymeleaf.standard.fragment.StandardFragment;
 import org.thymeleaf.standard.fragment.StandardFragmentProcessor;
+import org.thymeleaf.standard.fragment.StandardFragmentSignatureNodeReferenceChecker;
 
 
 /**
@@ -176,13 +177,9 @@ public class ThymeleafAttributeRenderer
 
         final String tilesDialectPrefix = getTilesDialectPrefix(templateEngine);
 
-        final DOMSelector.INodeReferenceChecker nodeReferenceChecker =
-                new TilesFragmentSignatureNodeReferenceChecker(
-                        templateEngine.getConfiguration(), tilesDialectPrefix, TilesFragmentAttrProcessor.ATTR_NAME);
-
         final StandardFragment standardFragment =
                 StandardFragmentProcessor.computeStandardFragmentSpec(configuration, processingContext,
-                    templateSelector, nodeReferenceChecker);
+                    templateSelector, tilesDialectPrefix, TilesFragmentAttrProcessor.ATTR_NAME);
 
         return new TilesFragment(standardFragment);
         
@@ -255,7 +252,7 @@ public class ThymeleafAttributeRenderer
         final String tilesDialectPrefix = getTilesDialectPrefix(templateEngine);
 
         final DOMSelector.INodeReferenceChecker nodeReferenceChecker =
-                new TilesFragmentSignatureNodeReferenceChecker(
+                new StandardFragmentSignatureNodeReferenceChecker(
                         templateEngine.getConfiguration(), tilesDialectPrefix, TilesFragmentAttrProcessor.ATTR_NAME);
 
         final IFragmentSpec fragmentSpec = new DOMSelectorFragmentSpec(fragmentSelector, nodeReferenceChecker);
