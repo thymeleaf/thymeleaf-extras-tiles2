@@ -19,41 +19,12 @@
  */
 package org.thymeleaf.extras.tiles2.renderer;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.jsp.PageContext;
-
-import org.apache.tiles.Attribute;
-import org.apache.tiles.context.TilesRequestContext;
-import org.apache.tiles.impl.InvalidTemplateException;
-import org.apache.tiles.jsp.context.JspTilesRequestContext;
-import org.apache.tiles.renderer.impl.AbstractTypeDetectingAttributeRenderer;
-import org.apache.tiles.servlet.context.ServletTilesRequestContext;
-import org.apache.tiles.servlet.context.ServletUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.thymeleaf.Configuration;
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.IProcessingContext;
-import org.thymeleaf.dialect.IDialect;
-import org.thymeleaf.dom.DOMSelector;
 import org.thymeleaf.dom.Element;
 import org.thymeleaf.dom.Node;
-import org.thymeleaf.exceptions.ConfigurationException;
-import org.thymeleaf.exceptions.TemplateProcessingException;
-import org.thymeleaf.extras.tiles2.dialect.TilesDialect;
-import org.thymeleaf.extras.tiles2.dialect.processor.TilesFragmentAttrProcessor;
-import org.thymeleaf.extras.tiles2.naming.ThymeleafTilesNaming;
-import org.thymeleaf.fragment.DOMSelectorFragmentSpec;
 import org.thymeleaf.fragment.IFragmentSpec;
-import org.thymeleaf.fragment.WholeFragmentSpec;
-import org.thymeleaf.standard.StandardDialect;
-import org.thymeleaf.standard.fragment.StandardFragment;
-import org.thymeleaf.standard.fragment.StandardFragmentProcessor;
 import org.thymeleaf.util.Validate;
 
 

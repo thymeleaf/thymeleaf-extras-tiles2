@@ -25,8 +25,8 @@ import java.util.Set;
 import org.thymeleaf.dialect.AbstractDialect;
 import org.thymeleaf.extras.tiles2.dialect.processor.TilesFragmentAttrProcessor;
 import org.thymeleaf.extras.tiles2.dialect.processor.TilesIncludeAttrProcessor;
-import org.thymeleaf.extras.tiles2.dialect.processor.TilesSubstituteByAttrProcessor;
 import org.thymeleaf.extras.tiles2.dialect.processor.TilesStringAttrProcessor;
+import org.thymeleaf.extras.tiles2.dialect.processor.TilesSubstituteByAttrProcessor;
 import org.thymeleaf.processor.IProcessor;
 
 
