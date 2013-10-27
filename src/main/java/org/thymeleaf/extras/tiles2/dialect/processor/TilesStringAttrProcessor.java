@@ -44,12 +44,10 @@ import org.thymeleaf.exceptions.ConfigurationException;
 import org.thymeleaf.exceptions.TemplateProcessingException;
 import org.thymeleaf.processor.attr.AbstractChildrenModifierAttrProcessor;
 
-
-
 /**
+ * Inserts String-type Tiles attributes.
  * 
  * @author Daniel Fern&aacute;ndez
- *
  */
 public class TilesStringAttrProcessor
         extends AbstractChildrenModifierAttrProcessor {

@@ -22,9 +22,9 @@ package org.thymeleaf.extras.tiles2.dialect.processor;
 import org.thymeleaf.processor.attr.AbstractNoOpAttrProcessor;
 
 /**
+ * Marks an area as a fragment to be included as a Tiles attribute.
  * 
  * @author Daniel Fern&aacute;ndez
- * 
  */
 public class TilesFragmentAttrProcessor 
             extends AbstractNoOpAttrProcessor {

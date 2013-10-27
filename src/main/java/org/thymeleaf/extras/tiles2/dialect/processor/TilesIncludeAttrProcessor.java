@@ -19,13 +19,10 @@
  */
 package org.thymeleaf.extras.tiles2.dialect.processor;
 
-
-
-
 /**
+ * Include a Tiles attribute.
  * 
  * @author Daniel Fern&aacute;ndez
- *
  */
 public class TilesIncludeAttrProcessor
         extends AbstractTilesFragmentHandlingAttrProcessor {

@@ -22,12 +22,10 @@ package org.thymeleaf.extras.tiles2.dialect.processor;
 import org.thymeleaf.Arguments;
 import org.thymeleaf.dom.Element;
 
-
-
 /**
+ * Include a Tiles attribute.
  * 
  * @author Daniel Fern&aacute;ndez
- *
  */
 public class TilesSubstituteByAttrProcessor
         extends AbstractTilesFragmentHandlingAttrProcessor {

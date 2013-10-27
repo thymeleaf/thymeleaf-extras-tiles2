@@ -20,43 +20,35 @@
 	prefix="tiles" namespace-uri="http://www.thymeleaf.org/extras/tiles" namespace-strict="false"
 	class="org.thymeleaf.extras.tiles2.dialect.TilesDialect">
 
-	<attribute-processor name="fragment">
+	<attribute-processor
+		name="fragment"
+		class="org.thymeleaf.extras.tiles2.dialect.processor.TilesFragmentAttrProcessor">
 		<documentation
 			see-also="include substituteby"
-			reference="Thymeleaf Tiles 2 integration module readme">
-			<![CDATA[
-			Marks an area as a fragment to be included as a Tiles attribute.
-			]]>
-		</documentation>
+			reference="Thymeleaf Tiles 2 integration module readme"/>
 	</attribute-processor>
 
-	<attribute-processor name="include">
+	<attribute-processor
+		name="include"
+		class="org.thymeleaf.extras.tiles2.dialect.processor.TilesIncludeAttrProcessor">
 		<documentation
 			see-also="substituteby fragment"
-			reference="Thymeleaf Tiles 2 integration module readme">
-			<![CDATA[
-			Include a Tiles attribute.
-			]]>
-		</documentation>
+			reference="Thymeleaf Tiles 2 integration module readme"/>
 	</attribute-processor>
 
-	<attribute-processor name="string">
+	<attribute-processor
+		name="string"
+		class="org.thymeleaf.extras.tiles2.dialect.processor.TilesStringAttrProcessor">
 		<documentation
-			reference="Thymeleaf Tiles 2 integration module readme">
-			<![CDATA[
-			Inserts String-type Tiles attributes.
-			]]>
-		</documentation>
+			reference="Thymeleaf Tiles 2 integration module readme"/>
 	</attribute-processor>
 
-	<attribute-processor name="substituteby">
+	<attribute-processor
+		name="substituteby"
+		class="org.thymeleaf.extras.tiles2.dialect.processor.TilesSubstituteByAttrProcessor">
 		<documentation
 			see-also="include fragment"
-			reference="Thymeleaf Tiles 2 integration module readme">
-			<![CDATA[
-			Include a Tiles attribute.
-			]]>
-		</documentation>
+			reference="Thymeleaf Tiles 2 integration module readme"/>
 	</attribute-processor>
 
 </dialect>
