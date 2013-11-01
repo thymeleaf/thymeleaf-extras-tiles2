@@ -29,7 +29,7 @@
 		name="fragment"
 		class="org.thymeleaf.extras.tiles2.dialect.processor.TilesFragmentAttrProcessor">
 		<documentation
-			see-also="include substituteby"
+			see-also="include replace substituteby"
 			reference="Thymeleaf Tiles 2 integration module readme"/>
 	</attribute-processor>
 
@@ -37,7 +37,7 @@
 		name="include"
 		class="org.thymeleaf.extras.tiles2.dialect.processor.TilesIncludeAttrProcessor">
 		<documentation
-			see-also="substituteby fragment"
+			see-also="fragment replace substituteby"
 			reference="Thymeleaf Tiles 2 integration module readme"/>
 	</attribute-processor>
 
@@ -52,7 +52,15 @@
 		name="substituteby"
 		class="org.thymeleaf.extras.tiles2.dialect.processor.TilesSubstituteByAttrProcessor">
 		<documentation
-			see-also="include fragment"
+			see-also="fragment include replace"
+			reference="Thymeleaf Tiles 2 integration module readme"/>
+	</attribute-processor>
+
+	<attribute-processor
+		name="replace"
+		class="org.thymeleaf.extras.tiles2.dialect.processor.TilesReplaceAttrProcessor">
+		<documentation
+			see-also="fragment include substituteby"
 			reference="Thymeleaf Tiles 2 integration module readme"/>
 	</attribute-processor>
 
