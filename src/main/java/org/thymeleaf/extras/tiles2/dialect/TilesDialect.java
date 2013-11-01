@@ -52,11 +52,6 @@ public class TilesDialect extends AbstractDialect {
         return DEFAULT_PREFIX;
     }
 
-    
-    public boolean isLenient() {
-        return false;
-    }
-
 
 
     @Override
