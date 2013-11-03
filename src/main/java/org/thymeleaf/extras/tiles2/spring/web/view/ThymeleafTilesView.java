@@ -19,6 +19,7 @@
  */
 package org.thymeleaf.extras.tiles2.spring.web.view;
 
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -30,6 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.tiles.TilesContainer;
 import org.apache.tiles.servlet.context.ServletUtil;
+import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.support.JstlUtils;
 import org.springframework.web.servlet.support.RequestContext;
 import org.springframework.web.servlet.view.AbstractTemplateView;
@@ -51,8 +53,37 @@ import org.thymeleaf.spring3.view.AbstractThymeleafView;
  *
  */
 public class ThymeleafTilesView extends AbstractThymeleafView {
-    
-    
+
+    /*
+     * If this is not null, we are using Spring 3.1+ and there is the possibility
+     * to automatically add @PathVariable's to models. This will be computed at class
+     * initialization time.
+     */
+    private static final String pathVariablesSelector;
+
+
+
+
+    static {
+
+        /*
+         * Compute whether we can obtain @PathVariable's from the request and add them
+         * automatically to the model (Spring 3.1+)
+         */
+
+        String pathVariablesSelectorValue = null;
+        try {
+            // We are looking for the value of the View.PATH_VARIABLES constant, which is a String
+            final Field pathVariablesField =  View.class.getDeclaredField("PATH_VARIABLES");
+            pathVariablesSelectorValue = (String) pathVariablesField.get(null);
+        } catch (final NoSuchFieldException ignored) {
+            pathVariablesSelectorValue = null;
+        } catch (final IllegalAccessException ignored) {
+            pathVariablesSelectorValue = null;
+        }
+        pathVariablesSelector = pathVariablesSelectorValue;
+    }
+
     
     
     public ThymeleafTilesView() {
@@ -105,12 +136,18 @@ public class ThymeleafTilesView extends AbstractThymeleafView {
         if (getLocale() == null) {
             throw new IllegalArgumentException("Property 'locale' is required");
         }
-        
-        final Map<String, Object> mergedModel = new HashMap<String, Object>();
-        
-        final Map<String, Object> staticVariables = this.getStaticVariables();
-        if (staticVariables != null) {
-            mergedModel.putAll(staticVariables);
+
+        final Map<String, Object> mergedModel = new HashMap<String, Object>(30);
+        final Map<String, Object> templateStaticVariables = this.getStaticVariables();
+        if (templateStaticVariables != null) {
+            mergedModel.putAll(templateStaticVariables);
+        }
+        if (pathVariablesSelector != null) {
+            @SuppressWarnings("unchecked")
+            final Map<String, Object> pathVars = (Map<String, Object>) request.getAttribute(pathVariablesSelector);
+            if (pathVars != null) {
+                mergedModel.putAll(pathVars);
+            }
         }
         if (model != null) {
             mergedModel.putAll(model);
