@@ -27,7 +27,7 @@ This software is licensed under the [Apache License 2.0]
 Requirements
 ------------
 
-  *   Thymeleaf **2.0.14+** (or **2.1.0-beta2**)
+  *   Thymeleaf **2.1.0+**
   *   Apache Tiles 2 version **2.2.1+** (**2.2.2** recommended)
   *   Web environment (Tiles integration cannot work offline)
 
@@ -56,13 +56,13 @@ Features
     *   Include Thymeleaf templates (or fragments of templates) as attributes.
     *   Compatible with Tiles definition wildcards (Tiles 2.2.2+).
 	*   Thymeleaf template/attribute definitions can include selectors 
-        (similar to `th:include`/`th:substituteby`):
-	  *   By fragment: `"template :: fragment"`
-	  *   By DOM selector (XPath-like): `"template :: [//div[@id='content']]"`
+        (similar to `th:include`/`th:replace`):
+	  *   By fragment name: `"template :: fragment"`
+	  *   By DOM selector: `"template :: div#content"`
 	  *   Can include Standard Expressions: 
 	      `"${templateName} :: ${conf.fragName}"`
   *   New **`tiles` dialect**:
-    *   `tiles:include` / `tiles:substituteby` for including Tiles attributes.
+    *   `tiles:include` / `tiles:replace` for including Tiles attributes.
 	*   `tiles:fragment` for signaling fragments to be included as attributes.
 	*   `tiles:string` for inserting String-type Tiles attributes.
   *   Enable **Natural templating** in your Tiles markup fragments:
@@ -176,7 +176,7 @@ Using Thymeleaf in our definition files (usually called something like
 	*   We can use `templateType="jsp"` for our JSP templates
 	    (`type="jsp"` for our attributes).
   *   Thymeleaf value syntax is equivalent to that of  `th:include` and
-      `th:substituteby` attributes:
+      `th:replace` attributes:
 	  `"TEMPLATESELECTOR (:: FRAGMENTSELECTOR)?"`
 	  *   Template Selector:
 	    *    Understandable by the template resolvers you configured, just as
@@ -185,7 +185,7 @@ Using Thymeleaf in our definition files (usually called something like
 		operands, etc. (externalized messages and links are *not allowed*).
 	  *   Fragment Selector (optional): 
 	    *    Can specify fragments by name (using attribute `tiles:fragment`).
-		*    Can specify XPath-like DOM Selector (`[//div[@id='content']`)
+		*    Can specify DOM Selector (`div#content`)
 		*    Can use Standard Expressions: `${...}`, `*{...}`, literals,
 		operands, etc. (externalized messages and links are *not allowed*).
   * Tiles definition wildcards (from Tiles 2.2.2) can be used.
@@ -231,16 +231,16 @@ That `tiles:include` will work equivalently to the Standard Dialect's
 `th:include`, only inserting a Tiles attribute by its name (as specified
 in the definition file) instead of another template.
 
-Another possibility, `tiles:substituteby`:
+Another possibility, `tiles:replace`:
 
 ```xml
-    <div tiles:substituteby="side">
+    <div tiles:replace="side">
 	   some prototyping markup over here...
 	</div>
 ```
 
-...will work almost exactly as `tiles:include`, but substituting the
-containing `<div>` tag by the attribute contents, instead of inserting
+...will work almost exactly as `tiles:include`, but replacing the
+containing `<div>` tag with the attribute contents, instead of inserting
 these contents inside it.
 
 What about inserting *string* attributes? Easy:
@@ -346,7 +346,7 @@ of `orderdet.html`:
         ...
         ...
     
-        <div tiles:substituteby="prog_content">
+        <div tiles:replace="prog_content">
     	  Progress of your order: GOOD!
     	</div>
     	
@@ -389,7 +389,7 @@ The relevant parts of our `progress.html` file could look like:
 Note that, in order for Spring Web Flow to be able to refresh a markup fragment via AJAX, 
 the specific fragment must be completely enclosed in an element specifying an `id` attribute, 
 like the `<div id="progressText" ...>` you see above. Also note that in order to preserve 
-that `id` when it renders, we use `tiles:substituteby` instead of `tiles:include`.
+that `id` when it renders, we use `tiles:replace` instead of `tiles:include`.
 
 
 Our flow can now define a transition for updating that fragment as a part of 
