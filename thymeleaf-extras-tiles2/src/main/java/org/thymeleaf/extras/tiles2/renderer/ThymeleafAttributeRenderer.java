@@ -67,8 +67,10 @@ public class ThymeleafAttributeRenderer
 
     
     
-    private static final String SPRING_STANDARD_DIALECT_CLASS_NAME = 
+    private static final String SPRING3_STANDARD_DIALECT_CLASS_NAME =
             "org.thymeleaf.spring3.dialect.SpringStandardDialect";
+    private static final String SPRING4_STANDARD_DIALECT_CLASS_NAME =
+            "org.thymeleaf.spring4.dialect.SpringStandardDialect";
 
     
     
@@ -192,12 +194,24 @@ public class ThymeleafAttributeRenderer
         
         try {
             final Class<?> springStandardDialectClass = 
-                    Class.forName(SPRING_STANDARD_DIALECT_CLASS_NAME);
-            return isDialectPresent(templateEngine, springStandardDialectClass);
+                    Class.forName(SPRING3_STANDARD_DIALECT_CLASS_NAME);
+            if (isDialectPresent(templateEngine, springStandardDialectClass)) {
+                return true;
+            }
         } catch (final ClassNotFoundException e) {
             // nothing to do, just do other checks
         }
-        
+
+        try {
+            final Class<?> springStandardDialectClass =
+                    Class.forName(SPRING4_STANDARD_DIALECT_CLASS_NAME);
+            if (isDialectPresent(templateEngine, springStandardDialectClass)) {
+                return true;
+            }
+        } catch (final ClassNotFoundException e) {
+            // nothing to do, just do other checks
+        }
+
         return isDialectPresent(templateEngine, StandardDialect.class);
         
     }

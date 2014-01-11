@@ -11,14 +11,21 @@
   
   <fileSets>
     <fileSet>
-      <directory>${basedir}/target/apidocs/</directory>
+      <directory>${basedir}/../thymeleaf-extras-tiles2/target/checkout/target/apidocs/</directory>
       <outputDirectory>/apidocs/thymeleaf-extras-tiles2/</outputDirectory>
       <includes>
         <include>**/*</include>
       </includes>
     </fileSet>
     <fileSet>
-      <directory>${basedir}/target/</directory>
+      <directory>${basedir}/../thymeleaf-extras-tiles2-spring3/target/checkout/target/apidocs/</directory>
+      <outputDirectory>/apidocs/thymeleaf-extras-tiles2-spring3/</outputDirectory>
+      <includes>
+        <include>**/*</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>${basedir}/../thymeleaf-extras-tiles2/target/checkout/target/</directory>
       <outputDirectory>/dist</outputDirectory>
       <includes>
         <include>thymeleaf-extras-tiles2-${project.version}.jar</include>
@@ -27,12 +34,27 @@
       </includes>
     </fileSet>
     <fileSet>
+      <directory>${basedir}/../thymeleaf-extras-tiles2-spring3/target/checkout/target/</directory>
+      <outputDirectory>/dist</outputDirectory>
+      <includes>
+        <include>thymeleaf-extras-tiles2-spring3-${project.version}.jar</include>
+        <include>thymeleaf-extras-tiles2-spring3-${project.version}-javadoc.jar</include>
+        <include>thymeleaf-extras-tiles2-spring3-${project.version}-sources.jar</include>
+      </includes>
+    </fileSet>
+    <fileSet>
       <directory>${basedir}/</directory>
       <outputDirectory>/</outputDirectory>
       <includes>
         <include>LICENSE.txt</include>
-        <include>README.markdown</include>
         <include>NOTICE.txt</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>${basedir}/../</directory>
+      <outputDirectory>/</outputDirectory>
+      <includes>
+        <include>README.markdown</include>
       </includes>
     </fileSet>
   </fileSets>
@@ -45,7 +67,9 @@
       <scope>runtime</scope>
       <excludes>
         <exclude>org.thymeleaf.extras:thymeleaf-extras-tiles2</exclude>
-        </excludes>
+        <exclude>org.thymeleaf.extras:thymeleaf-extras-tiles2-spring3</exclude>
+        <exclude>org.thymeleaf.extras:thymeleaf-extras-tiles2-dist</exclude>
+      </excludes>
     </dependencySet>
   </dependencySets> 
   
