@@ -31,6 +31,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.tiles.TilesContainer;
 import org.apache.tiles.servlet.context.ServletUtil;
+import org.springframework.context.ApplicationContext;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.support.JstlUtils;
 import org.springframework.web.servlet.support.RequestContext;
@@ -42,6 +44,7 @@ import org.thymeleaf.context.IWebContext;
 import org.thymeleaf.extras.tiles2.spring.web.configurer.ThymeleafTilesConfigurer;
 import org.thymeleaf.spring3.SpringTemplateEngine;
 import org.thymeleaf.spring3.context.SpringWebContext;
+import org.thymeleaf.spring3.expression.ThymeleafEvaluationContext;
 import org.thymeleaf.spring3.naming.SpringContextVariableNames;
 import org.thymeleaf.spring3.view.AbstractThymeleafView;
 
@@ -154,7 +157,9 @@ public class ThymeleafTilesView extends AbstractThymeleafView {
         }
 
 
-        final RequestContext requestContext = 
+        final ApplicationContext applicationContext = getApplicationContext();
+
+        final RequestContext requestContext =
                 new RequestContext(request, response, servletContext, mergedModel);
         
         // For compatibility with ThymeleafView
@@ -162,7 +167,14 @@ public class ThymeleafTilesView extends AbstractThymeleafView {
         // For compatibility with AbstractTemplateView
         addRequestContextAsVariable(mergedModel, AbstractTemplateView.SPRING_MACRO_REQUEST_CONTEXT_ATTRIBUTE, requestContext);
 
-        
+        // Expose Thymeleaf's own evaluation context as a model variable
+        final ConversionService conversionService =
+                (ConversionService) request.getAttribute(ConversionService.class.getName()); // might be null!
+        final ThymeleafEvaluationContext evaluationContext =
+                new ThymeleafEvaluationContext(applicationContext, conversionService);
+        mergedModel.put(ThymeleafEvaluationContext.THYMELEAF_EVALUATION_CONTEXT_CONTEXT_VARIABLE_NAME, evaluationContext);
+
+
         final IWebContext context = 
                 new SpringWebContext(request, response, servletContext , getLocale(), mergedModel, getApplicationContext());
         final IProcessingContext processingContext = 
