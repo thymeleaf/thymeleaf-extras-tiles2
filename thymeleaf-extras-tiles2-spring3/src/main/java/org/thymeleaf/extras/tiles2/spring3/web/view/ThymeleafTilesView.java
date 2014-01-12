@@ -17,7 +17,7 @@
  * 
  * =============================================================================
  */
-package org.thymeleaf.extras.tiles2.spring.web.view;
+package org.thymeleaf.extras.tiles2.spring3.web.view;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -41,7 +41,7 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.DialectAwareProcessingContext;
 import org.thymeleaf.context.IProcessingContext;
 import org.thymeleaf.context.IWebContext;
-import org.thymeleaf.extras.tiles2.spring.web.configurer.ThymeleafTilesConfigurer;
+import org.thymeleaf.extras.tiles2.spring3.web.configurer.ThymeleafTilesConfigurer;
 import org.thymeleaf.spring3.SpringTemplateEngine;
 import org.thymeleaf.spring3.context.SpringWebContext;
 import org.thymeleaf.spring3.expression.ThymeleafEvaluationContext;

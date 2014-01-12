@@ -17,7 +17,7 @@
  * 
  * =============================================================================
  */
-package org.thymeleaf.extras.tiles2.spring.web.factory;
+package org.thymeleaf.extras.tiles2.spring3.web.factory;
 
 import java.io.IOException;
 import java.net.URL;
@@ -45,7 +45,7 @@ import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.PropertyAccessorFactory;
 import org.springframework.util.ClassUtils;
 import org.springframework.web.servlet.view.tiles2.TilesConfigurer;
-import org.thymeleaf.extras.tiles2.spring.web.configurer.ThymeleafTilesConfigurer;
+import org.thymeleaf.extras.tiles2.spring3.web.configurer.ThymeleafTilesConfigurer;
 
 
 

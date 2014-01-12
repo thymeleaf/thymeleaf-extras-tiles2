@@ -17,7 +17,7 @@
  * 
  * =============================================================================
  */
-package org.thymeleaf.extras.tiles2.spring.web.factory;
+package org.thymeleaf.extras.tiles2.spring3.web.factory;
 
 import java.lang.reflect.Field;
 

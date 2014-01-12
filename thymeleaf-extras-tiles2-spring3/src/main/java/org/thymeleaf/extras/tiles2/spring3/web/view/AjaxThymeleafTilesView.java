@@ -17,7 +17,7 @@
  * 
  * =============================================================================
  */
-package org.thymeleaf.extras.tiles2.spring.web.view;
+package org.thymeleaf.extras.tiles2.spring3.web.view;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -44,7 +44,7 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.IProcessingContext;
 import org.thymeleaf.exceptions.ConfigurationException;
 import org.thymeleaf.extras.tiles2.context.ThymeleafTilesRequestContextFactory;
-import org.thymeleaf.extras.tiles2.spring.web.configurer.ThymeleafTilesConfigurer;
+import org.thymeleaf.extras.tiles2.spring3.web.configurer.ThymeleafTilesConfigurer;
 import org.thymeleaf.spring3.view.AjaxEnabledView;
 
 

@@ -17,13 +17,13 @@
  * 
  * =============================================================================
  */
-package org.thymeleaf.extras.tiles2.spring.web.startup;
+package org.thymeleaf.extras.tiles2.spring3.web.startup;
 
 import org.apache.tiles.TilesApplicationContext;
 import org.apache.tiles.factory.AbstractTilesContainerFactory;
 import org.apache.tiles.startup.AbstractTilesInitializer;
-import org.thymeleaf.extras.tiles2.spring.web.configurer.ThymeleafTilesConfigurer;
-import org.thymeleaf.extras.tiles2.spring.web.factory.ThymeleafTilesContainerFactory;
+import org.thymeleaf.extras.tiles2.spring3.web.configurer.ThymeleafTilesConfigurer;
+import org.thymeleaf.extras.tiles2.spring3.web.factory.ThymeleafTilesContainerFactory;
 
 
 

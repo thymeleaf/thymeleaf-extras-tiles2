@@ -17,7 +17,7 @@
  * 
  * =============================================================================
  */
-package org.thymeleaf.extras.tiles2.spring.web.view;
+package org.thymeleaf.extras.tiles2.spring3.web.view;
 
 import java.util.Map;
 

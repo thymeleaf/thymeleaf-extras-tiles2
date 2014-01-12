@@ -17,12 +17,12 @@
  * 
  * =============================================================================
  */
-package org.thymeleaf.extras.tiles2.spring.web.configurer;
+package org.thymeleaf.extras.tiles2.spring3.web.configurer;
 
 import org.apache.tiles.startup.TilesInitializer;
 import org.springframework.util.ClassUtils;
 import org.springframework.web.servlet.view.tiles2.TilesConfigurer;
-import org.thymeleaf.extras.tiles2.spring.web.startup.ThymeleafTilesInitializer;
+import org.thymeleaf.extras.tiles2.spring3.web.startup.ThymeleafTilesInitializer;
 
 
 
