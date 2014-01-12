@@ -7,6 +7,9 @@
      artifacts for the integration of Thymeleaf, Tiles and Spring 3.x.
    * thymeleaf-extras-tiles2-dist: utility project for the creation of the
      distribution .zip file containing all other modules, javadoc, etc.
+- Added specific module for Spring 4 support (via thymeleaf-spring4).
+- Fixed ConversionService not being available in Tiles applications due
+  to Thymeleaf's EvaluationContext not being created.
 
 
 2.1.0
