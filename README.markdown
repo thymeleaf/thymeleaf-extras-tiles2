@@ -90,7 +90,7 @@ etc.), and then create an instance of the `ThymeleafTilesConfigurer` (similar
 to the Spring Tiles configurer for JSP), like:
 
 ```xml
-    <bean id="tilesConfigurer" class="org.thymeleaf.extras.tiles2.spring.web.configurer.ThymeleafTilesConfigurer">
+    <bean id="tilesConfigurer" class="org.thymeleaf.extras.tiles2.spring3.web.configurer.ThymeleafTilesConfigurer">
       <property name="definitions">
         <list>
           <value>/WEB-INF/tiles-defs.xml</value>
@@ -104,7 +104,7 @@ use a specialized Thymeleaf-Tiles2 view class:
 
 ```xml
     <bean id="tilesViewResolver" class="org.thymeleaf.spring3.view.ThymeleafViewResolver">
-      <property name="viewClass" value="org.thymeleaf.extras.tiles2.spring.web.view.ThymeleafTilesView"/>
+      <property name="viewClass" value="org.thymeleaf.extras.tiles2.spring3.web.view.ThymeleafTilesView"/>
       <property name="templateEngine" ref="templateEngine" />
     </bean>
 ```
@@ -299,7 +299,7 @@ instances that understand the SpringWebFlow-Tiles combination:
 
 ```xml
     <bean id="tilesViewResolver" class="org.thymeleaf.spring3.view.AjaxThymeleafViewResolver">
-      <property name="viewClass" value="org.thymeleaf.extras.tiles2.spring.web.view.FlowAjaxThymeleafTilesView"/>
+      <property name="viewClass" value="org.thymeleaf.extras.tiles2.spring3.web.view.FlowAjaxThymeleafTilesView"/>
       <property name="templateEngine" ref="templateEngine" />
     </bean>
 ```
