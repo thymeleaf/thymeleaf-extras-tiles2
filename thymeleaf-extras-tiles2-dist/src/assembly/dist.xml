@@ -11,21 +11,28 @@
   
   <fileSets>
     <fileSet>
-      <directory>${basedir}/../thymeleaf-extras-tiles2/target/checkout/target/apidocs/</directory>
+      <directory>${basedir}/../thymeleaf-extras-tiles2/target/checkout/thymeleaf-extras-tiles2/target/apidocs/</directory>
       <outputDirectory>/apidocs/thymeleaf-extras-tiles2/</outputDirectory>
       <includes>
         <include>**/*</include>
       </includes>
     </fileSet>
     <fileSet>
-      <directory>${basedir}/../thymeleaf-extras-tiles2-spring3/target/checkout/target/apidocs/</directory>
+      <directory>${basedir}/../thymeleaf-extras-tiles2-spring3/target/checkout/thymeleaf-extras-tiles2-spring3/target/apidocs/</directory>
       <outputDirectory>/apidocs/thymeleaf-extras-tiles2-spring3/</outputDirectory>
       <includes>
         <include>**/*</include>
       </includes>
     </fileSet>
     <fileSet>
-      <directory>${basedir}/../thymeleaf-extras-tiles2/target/checkout/target/</directory>
+      <directory>${basedir}/../thymeleaf-extras-tiles2-spring4/target/checkout/thymeleaf-extras-tiles2-spring4/target/apidocs/</directory>
+      <outputDirectory>/apidocs/thymeleaf-extras-tiles2-spring4/</outputDirectory>
+      <includes>
+        <include>**/*</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>${basedir}/../thymeleaf-extras-tiles2/target/checkout/thymeleaf-extras-tiles2/target/</directory>
       <outputDirectory>/dist</outputDirectory>
       <includes>
         <include>thymeleaf-extras-tiles2-${project.version}.jar</include>
@@ -34,12 +41,21 @@
       </includes>
     </fileSet>
     <fileSet>
-      <directory>${basedir}/../thymeleaf-extras-tiles2-spring3/target/checkout/target/</directory>
+      <directory>${basedir}/../thymeleaf-extras-tiles2-spring3/target/checkout/thymeleaf-extras-tiles2-spring3/target/</directory>
       <outputDirectory>/dist</outputDirectory>
       <includes>
         <include>thymeleaf-extras-tiles2-spring3-${project.version}.jar</include>
         <include>thymeleaf-extras-tiles2-spring3-${project.version}-javadoc.jar</include>
         <include>thymeleaf-extras-tiles2-spring3-${project.version}-sources.jar</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>${basedir}/../thymeleaf-extras-tiles2-spring4/target/checkout/thymeleaf-extras-tiles2-spring4/target/</directory>
+      <outputDirectory>/dist</outputDirectory>
+      <includes>
+        <include>thymeleaf-extras-tiles2-spring4-${project.version}.jar</include>
+        <include>thymeleaf-extras-tiles2-spring4-${project.version}-javadoc.jar</include>
+        <include>thymeleaf-extras-tiles2-spring4-${project.version}-sources.jar</include>
       </includes>
     </fileSet>
     <fileSet>
@@ -68,6 +84,7 @@
       <excludes>
         <exclude>org.thymeleaf.extras:thymeleaf-extras-tiles2</exclude>
         <exclude>org.thymeleaf.extras:thymeleaf-extras-tiles2-spring3</exclude>
+        <exclude>org.thymeleaf.extras:thymeleaf-extras-tiles2-spring4</exclude>
         <exclude>org.thymeleaf.extras:thymeleaf-extras-tiles2-dist</exclude>
       </excludes>
     </dependencySet>

@@ -24,7 +24,7 @@
   <groupId>org.thymeleaf.extras</groupId>
   <artifactId>thymeleaf-extras-tiles2-dist</artifactId>
   <packaging>jar</packaging>
-  <version>2.1.1-SNAPSHOT</version>
+  <version>2.1.1.RELEASE</version>
   <name>thymeleaf-extras-tiles2-dist</name>
   <url>http://www.thymeleaf.org</url>
 
@@ -169,6 +169,12 @@
     <dependency>
       <groupId>org.thymeleaf.extras</groupId>
       <artifactId>thymeleaf-extras-tiles2-spring3</artifactId>
+      <version>${project.version}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.thymeleaf.extras</groupId>
+      <artifactId>thymeleaf-extras-tiles2-spring4</artifactId>
       <version>${project.version}</version>
       <scope>compile</scope>
     </dependency>
