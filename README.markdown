@@ -13,7 +13,7 @@ Thymeleaf team.
 
 Current versions: 
 
-  * **Version 2.0.1** - for Thymeleaf 2.0 (requires 2.0.15+)
+  * **Version 2.0.1** - for Thymeleaf 2.0 (requires 2.0.20+)
 
 
 License
@@ -26,7 +26,7 @@ This software is licensed under the [Apache License 2.0]
 Requirements
 ------------
 
-  *   Thymeleaf **2.0.15+**
+  *   Thymeleaf **2.0.20+**
   *   Apache Tiles 2 version **2.2.1+** (**2.2.2** recommended)
   *   Web environment (Tiles integration cannot work offline)
 
