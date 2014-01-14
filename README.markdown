@@ -35,7 +35,10 @@ Maven info
 ----------
 
   *   groupId: `org.thymeleaf.extras`   
-  *   artifactId: `thymeleaf-extras-tiles2`
+  *   artifactId: 
+    *   Main package: `thymeleaf-extras-tiles2`
+    *   Spring 3 integration package: `thymeleaf-extras-tiles2-spring3`
+    *   Spring 4 integration package: `thymeleaf-extras-tiles2-spring4`
 
 
 Distribution packages
@@ -81,6 +84,9 @@ Features
 	
 Configuration with Spring
 -------------------------
+
+*(Note: the following code examples use Spring 3.x package naming (`.spring3.`). If you are using the `thymeleaf-extras-tiles2-spring4` package for integration with Spring 4 instead, you should replace `.spring3.` with `.spring4.`)*
+
 
 In order to use Apache Tiles 2 with Thymeleaf in your Spring MVC application,
 we will first need to configure our application in the usual way for
