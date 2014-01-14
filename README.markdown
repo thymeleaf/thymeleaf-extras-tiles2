@@ -13,8 +13,7 @@ Thymeleaf team.
 
 Current versions: 
 
-  * **Version 2.1.0.RELEASE** - for Thymeleaf 2.1 (requires 2.1.0+)
-  * **Version 2.0.0** - for Thymeleaf 2.0 (requires 2.0.14+)
+  * **Version 2.0.1** - for Thymeleaf 2.0 (requires 2.0.15+)
 
 
 License
@@ -27,7 +26,7 @@ This software is licensed under the [Apache License 2.0]
 Requirements
 ------------
 
-  *   Thymeleaf **2.0.14+**
+  *   Thymeleaf **2.0.15+**
   *   Apache Tiles 2 version **2.2.1+** (**2.2.2** recommended)
   *   Web environment (Tiles integration cannot work offline)
 
@@ -90,7 +89,7 @@ etc.), and then create an instance of the `ThymeleafTilesConfigurer` (similar
 to the Spring Tiles configurer for JSP), like:
 
 ```xml
-    <bean id="tilesConfigurer" class="org.thymeleaf.extras.tiles2.spring.web.configurer.ThymeleafTilesConfigurer">
+    <bean id="tilesConfigurer" class="org.thymeleaf.extras.tiles2.spring3.web.configurer.ThymeleafTilesConfigurer">
       <property name="definitions">
         <list>
           <value>/WEB-INF/tiles-defs.xml</value>
@@ -104,7 +103,7 @@ use a specialized Thymeleaf-Tiles2 view class:
 
 ```xml
     <bean id="tilesViewResolver" class="org.thymeleaf.spring3.view.ThymeleafViewResolver">
-      <property name="viewClass" value="org.thymeleaf.extras.tiles2.spring.web.view.ThymeleafTilesView"/>
+      <property name="viewClass" value="org.thymeleaf.extras.tiles2.spring3.web.view.ThymeleafTilesView"/>
       <property name="templateEngine" ref="templateEngine" />
     </bean>
 ```
@@ -299,7 +298,7 @@ instances that understand the SpringWebFlow-Tiles combination:
 
 ```xml
     <bean id="tilesViewResolver" class="org.thymeleaf.spring3.view.AjaxThymeleafViewResolver">
-      <property name="viewClass" value="org.thymeleaf.extras.tiles2.spring.web.view.FlowAjaxThymeleafTilesView"/>
+      <property name="viewClass" value="org.thymeleaf.extras.tiles2.spring3.web.view.FlowAjaxThymeleafTilesView"/>
       <property name="templateEngine" ref="templateEngine" />
     </bean>
 ```
