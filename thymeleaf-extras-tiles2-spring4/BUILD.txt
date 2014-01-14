@@ -1,5 +1,5 @@
 
- Building thymeleaf-extras-tiles2-spring3
+ Building thymeleaf-extras-tiles2-spring4
  ----------------------------------------
  
  To build thymeleaf-extras-tiles2 you will need Maven 2. You can 
@@ -12,17 +12,17 @@
  
      mvn clean:clean install
      
- And you will get a fresh target/thymeleaf-extras-tiles2-spring3-{version}.jar file.
+ And you will get a fresh target/thymeleaf-extras-tiles2-spring4-{version}.jar file.
  You will also get it installed in your local repository at:
  
-     $M2_REPO/org/thymeleaf/extras/thymeleaf-extras-tiles2-spring3/{version}/thymeleaf-extras-tiles2-spring3-{version}.jar
+     $M2_REPO/org/thymeleaf/extras/thymeleaf-extras-tiles2-spring4/{version}/thymeleaf-extras-tiles2-spring4-{version}.jar
 
 
 
- Generating Javadoc for thymeleaf-extras-tiles2-spring3
+ Generating Javadoc for thymeleaf-extras-tiles2-spring4
  ------------------------------------------------------
  
- If you wish to generate the javadoc for thymeleaf-extras-tiles2-spring3,
+ If you wish to generate the javadoc for thymeleaf-extras-tiles2-spring4,
  execute this from the project root folder:
  
      mvn javadoc:javadoc

@@ -38,10 +38,10 @@ import org.thymeleaf.context.DialectAwareProcessingContext;
 import org.thymeleaf.context.IProcessingContext;
 import org.thymeleaf.context.IWebContext;
 import org.thymeleaf.extras.tiles2.spring4.web.configurer.ThymeleafTilesConfigurer;
-import org.thymeleaf.spring3.SpringTemplateEngine;
-import org.thymeleaf.spring3.context.SpringWebContext;
-import org.thymeleaf.spring3.naming.SpringContextVariableNames;
-import org.thymeleaf.spring3.view.AbstractThymeleafView;
+import org.thymeleaf.spring4.SpringTemplateEngine;
+import org.thymeleaf.spring4.context.SpringWebContext;
+import org.thymeleaf.spring4.naming.SpringContextVariableNames;
+import org.thymeleaf.spring4.view.AbstractThymeleafView;
 
 
 

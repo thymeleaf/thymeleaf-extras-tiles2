@@ -45,7 +45,7 @@ import org.thymeleaf.context.IProcessingContext;
 import org.thymeleaf.exceptions.ConfigurationException;
 import org.thymeleaf.extras.tiles2.context.ThymeleafTilesRequestContextFactory;
 import org.thymeleaf.extras.tiles2.spring4.web.configurer.ThymeleafTilesConfigurer;
-import org.thymeleaf.spring3.view.AjaxEnabledView;
+import org.thymeleaf.spring4.view.AjaxEnabledView;
 
 
 /**
