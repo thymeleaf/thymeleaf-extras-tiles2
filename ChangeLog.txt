@@ -1,16 +1,19 @@
-1.0.0-beta2
-===========
-- Updated Thymeleaf dependencies to 2.0.12.
-- Fixed NullPointerException in ThymeleafTilesView when Model is null.
-- Refactored ThymeleafTilesView as a subclass of AbstractThymeleafView.
-- Added support for Spring WebFlow's AJAX fragment rendering at AjaxThymeleafTilesView
-  and FlowThymeleafTilesView.
-- Removed references to request.getSession() that could unnecessarily create a
-  new session for the user just for obtaining the ServletContext object.
-- Adapted attribute renderer to the core's new way of deciding whether a fragment 
-  should return the resulting container element or just its children.
+
+2.0.1
+=====
+- Divided library into three components:
+   * thymeleaf-extras-tiles2: core .jar, with no Spring dependencies. For 
+     Thymeleaf integration with Tiles without Spring.
+   * thymeleaf-extras-tiles2-spring3: additional .jar containing specific
+     artifacts for the integration of Thymeleaf, Tiles and Spring 3.x.
+   * thymeleaf-extras-tiles2-dist: utility project for the creation of the
+     distribution .zip file containing all other modules, javadoc, etc.
+- Added specific module for Spring 4 support (via thymeleaf-spring4).
+- Fixed ConversionService not being available in Tiles applications due
+  to Thymeleaf's EvaluationContext not being created.
 
 
-1.0.0-beta1
-===========
-- (Initial release)
+2.0.0
+=====
+- (First release of thymeleaf-extras-tiles2 for Thymeleaf 2.1)
+
