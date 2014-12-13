@@ -19,7 +19,7 @@
 <!-- ========================================================================= -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  
+
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.thymeleaf.extras</groupId>
   <artifactId>thymeleaf-extras-tiles2</artifactId>
@@ -42,7 +42,7 @@
     <name>The THYMELEAF team</name>
     <url>http://www.thymeleaf.org</url>
   </organization>
-  
+
   <scm>
     <url>scm:git:git@github.com:thymeleaf/thymeleaf-extras-tiles2.git</url>
     <connection>scm:git:git@github.com:thymeleaf/thymeleaf-extras-tiles2.git</connection>
@@ -77,7 +77,7 @@
       </roles>
     </developer>
   </developers>
-  
+
   <distributionManagement>
     <snapshotRepository>
       <id>sonatype-nexus-snapshots</id>
@@ -112,34 +112,34 @@
     <tiles.version>2.2.2</tiles.version>
     <slf4j.version>1.6.1</slf4j.version>
   </properties>
-  
+
   <build>
-  
+
     <resources>
-    
+
       <resource>
         <directory>src/main/resources</directory>
       </resource>
-    
+
       <resource>
-          <directory>.</directory>
-          <targetPath>META-INF</targetPath>
-          <includes>
-              <include>LICENSE.txt</include>
-              <include>NOTICE.txt</include>
-          </includes>
+        <directory>.</directory>
+        <targetPath>META-INF</targetPath>
+        <includes>
+          <include>LICENSE.txt</include>
+          <include>NOTICE.txt</include>
+        </includes>
       </resource>
-      
+
     </resources>
-    
+
     <testResources>
       <testResource>
         <directory>src/test/resources</directory>
       </testResource>
     </testResources>
-    
+
     <plugins>
-    
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -180,7 +180,7 @@
           <encoding>US-ASCII</encoding>
         </configuration>
       </plugin>
-      
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
@@ -200,7 +200,7 @@
           </execution>
         </executions>
       </plugin>
-      
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
@@ -229,7 +229,7 @@
           </execution>
         </executions>
       </plugin>
-      
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-release-plugin</artifactId>
@@ -254,14 +254,14 @@
 
 
     </plugins>
-    
+
   </build>
 
 
 
 
   <dependencies>
-    
+
     <dependency>
       <groupId>org.thymeleaf</groupId>
       <artifactId>thymeleaf</artifactId>
@@ -283,7 +283,7 @@
       <scope>provided</scope>
       <optional>true</optional>
     </dependency>
-    
+
     <dependency>
       <groupId>org.apache.tiles</groupId>
       <artifactId>tiles-core</artifactId>
@@ -309,7 +309,7 @@
       <scope>compile</scope>
     </dependency>
 
-  
+
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
@@ -317,8 +317,8 @@
       <scope>compile</scope>
     </dependency>
 
-    
+
   </dependencies>
 
-  
+
 </project>
