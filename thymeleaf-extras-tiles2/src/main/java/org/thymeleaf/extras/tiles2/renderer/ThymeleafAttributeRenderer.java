@@ -72,15 +72,37 @@ public class ThymeleafAttributeRenderer
     private static final String SPRING4_STANDARD_DIALECT_CLASS_NAME =
             "org.thymeleaf.spring4.dialect.SpringStandardDialect";
 
-    
-    
+
+    /** Fixed an issue where the ClassLoader was being hit heavily to check to see if 
+        what Spring Dialect was being used. Now check from one class instead of the Class 
+        Loader
+    **/
+    final static Class<?> spring3StandardDialectClass = getSpring3StandardDialectClassname();
+    final static Class<?> spring4StandardDialectClass = getSpring4StandardDialectClassname();
     
     public ThymeleafAttributeRenderer() {
         super();
     }
 
+	private static Class<?> getSpring3StandardDialectClassname() {
+		Class<?> springStandardDialectClass = null;
+		try {
+			springStandardDialectClass = Class
+					.forName(SPRING3_STANDARD_DIALECT_CLASS_NAME);
+		} catch (ClassNotFoundException e) {
+		}
+		return springStandardDialectClass;
+	}
     
-    
+	private static Class<?> getSpring4StandardDialectClassname() {
+		Class<?> springStandardDialectClass = null;
+		try {
+			springStandardDialectClass = Class
+					.forName(SPRING4_STANDARD_DIALECT_CLASS_NAME);
+		} catch (ClassNotFoundException e) {
+		}
+		return springStandardDialectClass;
+	}
     
     @Override
     public void write(final Object value, final Attribute attribute,
@@ -187,29 +209,20 @@ public class ThymeleafAttributeRenderer
         
     }
 
-    
-    
-    
+    /** Fixed an issue where the ClassLoader was being hit heavily to check to see if 
+        what Spring Dialect was being used. Now check from one class instead of the Class 
+        Loader
+    **/
     private static boolean isStandardDialectPresent(final TemplateEngine templateEngine) {
-        
-        try {
-            final Class<?> springStandardDialectClass = 
-                    Class.forName(SPRING3_STANDARD_DIALECT_CLASS_NAME);
-            if (isDialectPresent(templateEngine, springStandardDialectClass)) {
+    
+        if (spring3StandardDialectClass != null)
+            if (isDialectPresent(templateEngine, spring3StandardDialectClass)) {
                 return true;
-            }
-        } catch (final ClassNotFoundException e) {
-            // nothing to do, just do other checks
         }
 
-        try {
-            final Class<?> springStandardDialectClass =
-                    Class.forName(SPRING4_STANDARD_DIALECT_CLASS_NAME);
-            if (isDialectPresent(templateEngine, springStandardDialectClass)) {
+	if (spring4StandardDialectClass != null)
+	    if (isDialectPresent(templateEngine, spring4StandardDialectClass)) {
                 return true;
-            }
-        } catch (final ClassNotFoundException e) {
-            // nothing to do, just do other checks
         }
 
         return isDialectPresent(templateEngine, StandardDialect.class);
@@ -217,7 +230,8 @@ public class ThymeleafAttributeRenderer
     }
  
 
-    
+    /** Beed to clean this up to improve performance
+    **/
     private static boolean isDialectPresent(final TemplateEngine templateEngine, final Class<?> dialectClass) {
         for (final IDialect dialect : templateEngine.getDialects()) {
             if (dialectClass.isAssignableFrom(dialect.getClass())) {
