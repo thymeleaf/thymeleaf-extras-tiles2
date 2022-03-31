@@ -110,7 +110,7 @@
     <servlet-api.version>2.5</servlet-api.version>
     <jsp-api.version>2.1</jsp-api.version>
     <thymeleaf.version>2.1.2.RELEASE</thymeleaf.version>
-    <springframework.version>3.0.7.RELEASE</springframework.version>
+    <springframework.version>5.3.18</springframework.version>
     <springwebflow.version>2.3.1.RELEASE</springwebflow.version>
     <slf4j.version>1.6.6</slf4j.version>
   </properties>
